@@ -481,7 +481,7 @@ export default function AthletePortal({ session, supabase }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", background: BELT_COLORS[belt] || "#333", color: (isWhite || belt === "Gialla" || belt === "Arancione") ? "#222" : "#fff", border: isWhite ? "1px solid #bbb" : "none", borderRadius: 99, padding: large ? "6px 18px" : "3px 12px", fontSize: large ? 14 : 11, fontWeight: 700 }}>{belt}</span>
   );
-};
+}
 
 const BeltProgress = ({ belt }) => {
   const idx = BELT_ORDER.indexOf(belt);
