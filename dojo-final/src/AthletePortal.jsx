@@ -369,7 +369,7 @@ export default function AthletePortal({ session, supabase }) {
                 <div><label style={labelStyle}>Provincia</label><input style={inputStyle} value={reg.birthProvince} onChange={e => setField("birthProvince", e.target.value)} placeholder="FE" maxLength={2} /></div>
               </div>
               <div style={{ marginBottom: 12 }}><label style={labelStyle}>Stato di nascita</label><input style={inputStyle} value={reg.birthCountry} onChange={e => setField("birthCountry", e.target.value)} placeholder="Italia" /></div>
-              <div><label style={labelStyle}>Codice Fiscale</label><input style={{ ...inputStyle, textTransform: "uppercase" }} value={reg.fiscalCode} onChange={e => setField("fiscalCode", e.target.value.toUpperCase())} placeholder="RSSMRI80A01D548X (opzionale per stranieri)" maxLength={16} /></div>
+              <div><label style={labelStyle}>Codice Fiscale</label><input style={{ ...inputStyle, textTransform: "uppercase" }} value={reg.fiscalCode} onChange={e => setField("fiscalCode", e.target.value.toUpperCase())} placeholder="RSSMRI80A01D548X" maxLength={16} /></div>
             </div>
           )}
 
