@@ -11,7 +11,7 @@ const BELT_ORDER = Object.keys(BELT_COLORS);
 const COURSES = ["Karate Adulti", "Karate Bambini", "Psicomotricità"];
 const LOCATIONS = ["Argenta", "S.M. Codifiume"];
 const DISCIPLINES = ["Kata", "Kumite", "Entrambe"];
-const HOW_FOUND = ["Passaparola (amici/famiglia)", "Facebook / Instagram", "Google / Internet", "Volantino / Locandina", "Ho passato davanti alla palestra", "Scuola / Insegnante", "Altro"];
+const HOW_FOUND = ["Passaparola (amici/famiglia)", "Facebook / Instagram", "Google / Internet", "Volantino / Locandina", "Sono passato davanti alla palestra", "Scuola / Insegnante", "Altro"];
 const TABS = ["Dashboard", "Atleti", "Lezioni", "Pagamenti", "Esami & Gare", "Bacheca", "📊 Marketing"];
 
 const inputStyle = { width: "100%", background: "#0d0d0d", border: "1px solid #2a2a1a", borderRadius: 8, padding: "10px 12px", color: "#e8e0d0", fontFamily: "inherit", fontSize: 13, boxSizing: "border-box" };
