@@ -519,7 +519,7 @@ export default function AthletePortal({ session, supabase }) {
             </div>
             <div style={{ background: "#0d0c07", border: "1px solid #2a2010", borderRadius: 12, padding: "16px 20px", marginBottom: 22, fontSize: 13, color: "#5a5040", lineHeight: 1.8, textAlign: "left" }}>
               <div>📧 Riceverai conferma a <strong style={{ color: "#8a7a6a" }}>{reg.email}</strong></div>
-              <div style={{ marginTop: 6 }}>⏱️ Il Sensei approverà la tua iscrizione entro 24 ore</div>
+              <div style={{ marginTop: 6 }}>⏱️ La segreteria approverà la tua iscrizione entro 24 ore</div>
               <div style={{ marginTop: 6 }}>🔐 Poi potrai accedere con email e password</div>
             </div>
             <button onClick={() => setScreen("login")} style={{ background: "linear-gradient(135deg,#b8860b,#daa520)", color: "#0a0905", border: "none", borderRadius: 10, padding: "12px 32px", cursor: "pointer", fontSize: 14, fontWeight: 700, fontFamily: "inherit" }}>Vai al Login</button>
@@ -609,7 +609,7 @@ export default function AthletePortal({ session, supabase }) {
                   {m.medical_expiry && <div style={{ fontSize: 12, color: "#5a5040" }}>🏥 {new Date(m.medical_expiry).toLocaleDateString("it-IT")}</div>}
                 </div>
               ))}
-              {familyMembers.length > 0 && <div style={{ marginTop: 16, padding: "12px 16px", background: "rgba(218,165,32,0.06)", border: "1px solid rgba(218,165,32,0.2)", borderRadius: 10, fontSize: 12, color: "#8a7a6a" }}>💶 Il pagamento della quota è unico per tutta la famiglia · Contatta il Sensei per info</div>}
+              {familyMembers.length > 0 && <div style={{ marginTop: 16, padding: "12px 16px", background: "rgba(218,165,32,0.06)", border: "1px solid rgba(218,165,32,0.2)", borderRadius: 10, fontSize: 12, color: "#8a7a6a" }}>💶 Il pagamento della quota è unico per tutta la famiglia · Contatta la segreteria per info</div>}
             </div>
           )}
 
