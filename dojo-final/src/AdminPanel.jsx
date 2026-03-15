@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import { printModuloTesseramento } from "./printModulo.js";
-import { printModulo } from "./ModuloIscrizione.js";
 
 const BELT_COLORS = {
   "Bianca": "#f8f8f8", "Gialla": "#FFD700", "Arancione": "#FF8C00",
@@ -1231,7 +1230,7 @@ export default function AdminPanel({ session, supabase }) {
                               {a.status === "pending" && <button onClick={() => approveAthlete(a.id)} style={{ background: "rgba(34,197,94,0.2)", color: "#22c55e", border: "1px solid #22c55e", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>✓ Approva</button>}
                               {a.status === "approved" && <button onClick={() => markPaid(a.id)} style={{ background: "rgba(74,158,255,0.15)", color: "#4a9eff", border: "1px solid #4a9eff", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>💶 Pagamento</button>}
                               <button onClick={() => openAddAthlete("familiare", a.id)} style={{ background: "rgba(192,132,252,0.15)", color: "#c084fc", border: "1px solid #c084fc", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>+ Familiare</button>
-                              <button onClick={() => printModulo(a)} style={{ background: "rgba(234,179,8,0.1)", color: "#eab308", border: "1px solid #eab308", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>🖨️ Modulo</button>
+                              <button onClick={() => dulo(a)} style={{ background: "rgba(234,179,8,0.1)", color: "#eab308", border: "1px solid #eab308", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>🖨️ Modulo</button>
                             </div>
                           </td>
                         </tr>
