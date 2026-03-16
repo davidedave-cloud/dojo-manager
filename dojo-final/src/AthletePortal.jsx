@@ -346,6 +346,9 @@ export default function AthletePortal({ session, supabase }) {
         <button onClick={handleLogin} disabled={loginLoading} style={{ width: "100%", background: "linear-gradient(135deg,#b8860b,#daa520)", color: "#0a0905", border: "none", borderRadius: 10, padding: "14px", cursor: "pointer", fontSize: 15, fontWeight: 700, fontFamily: "inherit", opacity: loginLoading ? 0.7 : 1 }}>
           {loginLoading ? "Accesso in corso..." : "Accedi"}
         </button>
+<div style={{ textAlign: "center", marginTop: 14 }}>
+  <span onClick={handleResetPassword} style={{ fontSize: 12, color: "#8a7a6a", cursor: "pointer", textDecoration: "underline" }}>Password dimenticata?</span>
+</div>
         <div style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#5a5040" }}>Non hai un account? <span onClick={() => setScreen("register")} style={{ color: "#daa520", cursor: "pointer", textDecoration: "underline" }}>Iscriviti</span></div>
         <button onClick={() => setScreen("home")} style={{ display: "block", margin: "16px auto 0", background: "none", border: "none", color: "#4a3a2a", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Home</button>
       </div>
