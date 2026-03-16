@@ -1111,7 +1111,7 @@ export default function AdminPanel({ session, supabase }) {
   const BeltBadge = ({ belt }) => {
     if (!belt) return null;
     const isBlack = belt.startsWith("Nera"); const isBrown = belt.startsWith("Marrone");
-    return <span style={{ display: "inline-flex", alignItems: "center", background: isBlack ? "#1a1a1a" : isBrown ? "#8B4513" : BELT_COLORS[belt] || "#333", color: (belt === "Bianca" || belt === "Bianca/Gialla" || belt === "Gialla" || belt === "Arancione") ? "#333" : "#fff"", border: belt === "Bianca" ? "1px solid #ccc" : "none", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 600 }}>{belt}</span>;
+    return <span style={{ display: "inline-flex", alignItems: "center", background: isBlack ? "#1a1a1a" : isBrown ? "#8B4513" : BELT_COLORS[belt] || "#333", color: (belt === "Bianca" || belt === "Bianca/Gialla" || belt === "Gialla" || belt === "Arancione") ? "#333" : "#fff", border: belt === "Bianca" ? "1px solid #ccc" : "none", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 600 }}>{belt}</span>;
   };
 
   const StatusBadge = ({ status }) => {
