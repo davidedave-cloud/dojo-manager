@@ -1285,7 +1285,7 @@ export default function AdminPanel({ session, supabase }) {
                             <div style={{ fontSize: 13, color: "#ccc" }}>{a.course}</div>
                             <div style={{ fontSize: 11, color: "#777" }}>📍 {a.location}</div>
                           </td>
-                          <td style={{ padding: "14px 16px", minWidth: 120 }}><StatusBadge status={a.status} /></td>
+                          <td style={{ padding: "14px 16px", minWidth: 140 }}><StatusBadge status={a.status} /></td>
                           <td style={{ padding: "14px 16px", minWidth: 320 }}>
                             <div style={{ display: "flex", gap: 6, flexWrap: "nowrap" }}>
                               <button onClick={() => setSelectedAthlete(a)} style={{ background: "#2a2a1a", color: "#daa520", border: "1px solid #3a3a2a", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>Dettagli</button>
