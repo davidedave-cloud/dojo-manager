@@ -1111,7 +1111,7 @@ export default function AdminPanel({ session, supabase }) {
   const BeltBadge = ({ belt }) => {
     if (!belt) return null;
     const isBlack = belt.startsWith("Nera"); const isBrown = belt.startsWith("Marrone");
-    return <span style={{ display: "inline-flex", alignItems: "center", background: isBlack ? "#1a1a1a" : isBrown ? "#8B4513" : BELT_COLORS[belt] || "#333", color: (belt === "Bianca" || belt === "Gialla" || belt === "Arancione") ? "#333" : "#fff", border: belt === "Bianca" ? "1px solid #ccc" : "none", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 600 }}>{belt}</span>;
+    return <span style={{ display: "inline-flex", alignItems: "center", background: isBlack ? "#1a1a1a" : isBrown ? "#8B4513" : BELT_COLORS[belt] || "#333", color: (belt === "Bianca" || belt === "Bianca/Gialla" || belt === "Gialla" || belt === "Arancione") ? "#333" : "#fff"", border: belt === "Bianca" ? "1px solid #ccc" : "none", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 600 }}>{belt}</span>;
   };
 
   const StatusBadge = ({ status }) => {
@@ -1285,9 +1285,9 @@ export default function AdminPanel({ session, supabase }) {
                             <div style={{ fontSize: 13, color: "#ccc" }}>{a.course}</div>
                             <div style={{ fontSize: 11, color: "#777" }}>📍 {a.location}</div>
                           </td>
-                          <td style={{ padding: "14px 16px" }}><StatusBadge status={a.status} /></td>
-                          <td style={{ padding: "14px 16px" }}>
-                            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                          <td style={{ padding: "14px 16px", minWidth: 120 }}><StatusBadge status={a.status} /></td>
+                          <td style={{ padding: "14px 16px", minWidth: 320 }}>
+                            <div style={{ display: "flex", gap: 6, flexWrap: "nowrap" }}>
                               <button onClick={() => setSelectedAthlete(a)} style={{ background: "#2a2a1a", color: "#daa520", border: "1px solid #3a3a2a", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>Dettagli</button>
                               {a.status === "pending" && <button onClick={() => approveAthlete(a.id)} style={{ background: "rgba(34,197,94,0.2)", color: "#22c55e", border: "1px solid #22c55e", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>✓ Approva</button>}
                               {a.status === "approved" && <button onClick={() => setActiveTab("Pagamenti")} style={{ background: "rgba(74,158,255,0.15)", color: "#4a9eff", border: "1px solid #4a9eff", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>💶 Pagamento</button>}
