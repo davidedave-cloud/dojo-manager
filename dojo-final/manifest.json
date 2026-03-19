@@ -1,0 +1,24 @@
+{
+  "name": "Cinque Cerchi ASD",
+  "short_name": "Cinque Cerchi",
+  "description": "Portale atleti Cinque Cerchi ASD - Sezione Karate-do Tradizionale",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1408",
+  "theme_color": "#1a1408",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/assets/Logo%20CInque%20Cerchi%20Karate%20do%20Icona%20app.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/assets/Logo%20CInque%20Cerchi%20Karate%20do%20Icona%20app.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

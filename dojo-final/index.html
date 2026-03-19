@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cinque Cerchi ASD</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1a1408" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Cinque Cerchi" />
+    <link rel="apple-touch-icon" href="https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/assets/Logo%20CInque%20Cerchi%20Karate%20do%20Icona%20app.png" />
+
+    <!-- SEO -->
+    <meta name="description" content="Portale atleti Cinque Cerchi ASD - Sezione Karate-do Tradizionale" />
+
+    <style>* { margin: 0; padding: 0; box-sizing: border-box; } body { background: #0a0905; }</style>
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+      (function() {
+        emailjs.init({ publicKey: "Us3DnPl_mpixSLDxu" });
+        window.emailjs = emailjs;
+      })();
+
+      // Registra Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registrato:', reg.scope))
+            .catch(err => console.log('SW errore:', err));
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
