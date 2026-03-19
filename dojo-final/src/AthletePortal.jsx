@@ -364,7 +364,7 @@ export default function AthletePortal({ session, supabase }) {
     <div style={{ ...BASE, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
       {[600, 400, 200].map(s => <div key={s} style={{ position: "absolute", width: s, height: s, borderRadius: "50%", border: "1px solid #1a1408", top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: s === 200 ? "radial-gradient(circle,rgba(184,134,11,0.07) 0%,transparent 70%)" : "transparent" }} />)}
       <div style={{ textAlign: "center", zIndex: 1, opacity: mounted ? 1 : 0, transform: mounted ? "translateY(0)" : "translateY(20px)", transition: "all 0.8s ease" }}>
-        <img src="https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/assets/Karate%20Do%20w.png" alt="Cinque Cerchi ASD" style={{ width: 100, height: 100, objectFit: "contain", marginBottom: 8, mixBlendMode: "lighten" }} />
+        <img src="https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/assets/Karate%20Do%20w.png" alt="Cinque Cerchi ASD" style={{ width: 150, height: 150, objectFit: "contain", marginBottom: 8, mixBlendMode: "lighten" }} />
         <div style={{ fontSize: 36, fontWeight: 700, color: "#daa520", letterSpacing: "0.12em", textTransform: "uppercase" }}>Cinque Cerchi ASD</div>
         <div style={{ fontSize: 12, color: "#8a7a6a", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>Sezione Karate-do Tradizionale</div>
         <div style={{ fontSize: 11, color: "#5a5040", letterSpacing: "0.3em", textTransform: "uppercase", marginBottom: 48 }}>Portale Atleti</div>
