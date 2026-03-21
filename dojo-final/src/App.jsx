@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase.js'
 import AthletePortal from './AthletePortal.jsx'
-import AdminPanel from './AdminPanel.jsx'
+import AdminPanel from './AdminPanel.jsx' 
 
 export default function App() {
   const [session, setSession] = useState(null)
