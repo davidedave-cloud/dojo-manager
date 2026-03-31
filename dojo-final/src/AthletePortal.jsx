@@ -277,21 +277,56 @@ export default function AthletePortal({ session, supabase }) {
     else setLoginError("Errore nell'invio email. Verifica l'indirizzo.");
   }
 
-  async function handleAlreadyMember() {
-    const { email } = alreadyMember;
-    if (!email) { setAlreadyMember(p => ({...p, error: "Inserisci la tua email."})); return; }
-    setAlreadyMember(p => ({...p, loading: true, error: ""}));
-    const DEFAULT_PASSWORD = "Cinquecerchikarate";
-    // Prova a creare account con password di default
-    const { data: authData, error: authError } = await supabase.auth.signUp({ email: email.trim(), password: DEFAULT_PASSWORD });
-    if (authError) {
-      if (authError.message.includes("already registered") || authError.message.includes("already been registered")) {
-        // Ha già un account — prova login con password di default
-        const { error: loginErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password: DEFAULT_PASSWORD });
-        if (!loginErr) {
-          // Login riuscito con password di default -> forza cambio password
-          setMustChangePassword(true);
-          setAlreadyMember(p => ({...p, loading: false, success: true}));
+async function handleAlreadyMember() {
+  const email = alreadyMember.email.trim().toLowerCase();
+
+  if (!email) {
+    setAlreadyMember(p => ({ ...p, error: "Inserisci la tua email." }));
+    return;
+  }
+
+  setAlreadyMember(p => ({ ...p, loading: true, error: "", success: false }));
+
+  try {
+    const { data: existingList, error } = await supabase
+      .from("athletes")
+      .select("id, email")
+      .ilike("email", email);
+
+    if (error) {
+      setAlreadyMember(p => ({
+        ...p,
+        loading: false,
+        error: "Errore nella verifica dell'email. Riprova."
+      }));
+      return;
+    }
+
+    const existing = existingList && existingList.length > 0 ? existingList[0] : null;
+
+    if (!existing) {
+      setAlreadyMember(p => ({
+        ...p,
+        loading: false,
+        error: "Email non trovata nel sistema. Usa la stessa email comunicata in segreteria."
+      }));
+      return;
+    }
+
+    setAlreadyMember(p => ({
+      ...p,
+      loading: false,
+      success: true,
+      error: ""
+    }));
+  } catch (err) {
+    setAlreadyMember(p => ({
+      ...p,
+      loading: false,
+      error: "Si è verificato un errore imprevisto. Riprova."
+    }));
+  }
+}
           return;
         }
         // Ha già cambiato password -> manda alla schermata login
@@ -439,22 +474,44 @@ export default function AthletePortal({ session, supabase }) {
             <div style={{ textAlign: "center", marginBottom: 28 }}>
               <div style={{ fontSize: 40, marginBottom: 10 }}>🥋</div>
               <div style={{ fontSize: 22, fontWeight: 700, color: "#daa520" }}>Sei già iscritto?</div>
-              <div style={{ fontSize: 13, color: "#5a5040", marginTop: 8, lineHeight: 1.6 }}>Se la segreteria ti ha già registrato, inserisci la tua email e scegli una password per accedere al portale.</div>
+              <div style={{ fontSize: 13, color: "#5a5040", marginTop: 8, lineHeight: 1.6 }}>Se la segreteria ti ha già registrato, inserisci la tua email per verificare la presenza nel sistema.</div>
             </div>
             <div style={{ marginBottom: 20 }}><label style={labelStyle}>La tua email *</label><input type="email" style={inputStyle} value={alreadyMember.email} onChange={e => setAlreadyMember(p => ({...p, email: e.target.value}))} onKeyDown={e => e.key === "Enter" && handleAlreadyMember()} placeholder="la-tua@email.com" /></div>
             <div style={{ marginBottom: 20, padding: "10px 14px", background: "rgba(218,165,32,0.06)", border: "1px solid rgba(218,165,32,0.2)", borderRadius: 8, fontSize: 12, color: "#8a7a6a", lineHeight: 1.6 }}>
-              ℹ️ Accederai con la password temporanea <strong style={{color:"#daa520"}}>Cinquecerchikarate</strong>. Al primo accesso potrai cambiarla nelle Impostazioni.
+              ℹ️ Per motivi di sicurezza l'accesso non viene più creato automaticamente. Se la tua email è presente nel sistema, comparirà un messaggio con le istruzioni per procedere.
             </div>
             {alreadyMember.error && <div style={{ marginBottom: 16, padding: "10px 14px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8, fontSize: 12, color: "#ef4444" }}>⚠️ {alreadyMember.error}</div>}
             <button onClick={handleAlreadyMember} disabled={alreadyMember.loading} style={{ width: "100%", background: "linear-gradient(135deg,#b8860b,#daa520)", color: "#0a0905", border: "none", borderRadius: 10, padding: "14px", cursor: "pointer", fontSize: 15, fontWeight: 700, fontFamily: "inherit", opacity: alreadyMember.loading ? 0.7 : 1 }}>
-              {alreadyMember.loading ? "Verifica in corso..." : "✓ Accedi al portale"}
+              {alreadyMember.loading ? "Verifica in corso..." : "✓ Verifica email"}
             </button>
             <button onClick={() => setScreen("home")} style={{ display: "block", margin: "16px auto 0", background: "none", border: "none", color: "#4a3a2a", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>← Home</button>
           </>
         ) : (
           <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 56, marginBottom: 16 }}>🎌</div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: "#daa520", marginBottom: 10 }}>Accesso creato!</div>
+            <div style={{ textAlign: "center" }}>
+  <div style={{ fontSize: 56, marginBottom: 16 }}>📩</div>
+  <div style={{ fontSize: 22, fontWeight: 700, color: "#daa520", marginBottom: 10 }}>Email trovata</div>
+  <div style={{ fontSize: 14, color: "#8a7a6a", lineHeight: 1.8, marginBottom: 24 }}>
+    La tua email è presente nel sistema. Per ricevere o ripristinare l'accesso al portale, contatta la segreteria o l'amministratore.
+  </div>
+  <button
+    onClick={() => setScreen("login")}
+    style={{ background: "linear-gradient(135deg,#b8860b,#daa520)", color: "#0a0905", border: "none", borderRadius: 10, padding: "12px 32px", cursor: "pointer", fontSize: 14, fontWeight: 700, fontFamily: "inherit" }}
+  >
+    Vai al Login →
+  </button>
+</div>
+  <div style={{ fontSize: 22, fontWeight: 700, color: "#daa520", marginBottom: 10 }}>Email trovata</div>
+  <div style={{ fontSize: 14, color: "#8a7a6a", lineHeight: 1.8, marginBottom: 24 }}>
+    La tua email è presente nel sistema. Per ricevere o ripristinare l'accesso al portale, contatta la segreteria o l'amministratore.
+  </div>
+  <button
+    onClick={() => setScreen("login")}
+    style={{ background: "linear-gradient(135deg,#b8860b,#daa520)", color: "#0a0905", border: "none", borderRadius: 10, padding: "12px 32px", cursor: "pointer", fontSize: 14, fontWeight: 700, fontFamily: "inherit" }}
+  >
+    Vai al Login →
+  </button>
+</div>
             <div style={{ fontSize: 14, color: "#8a7a6a", lineHeight: 1.8, marginBottom: 24 }}>
               Benvenuto nel portale! Ora puoi accedere con la tua email e la password che hai appena scelto.
             </div>
