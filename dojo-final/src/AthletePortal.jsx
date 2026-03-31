@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+fimport { useState, useEffect } from "react";
 import { printModuloTesseramento } from "./printModulo.js";
 
 const BELT_COLORS = {
@@ -327,28 +327,6 @@ async function handleAlreadyMember() {
     }));
   }
 }
-          return;
-        }
-        // Ha già cambiato password -> manda alla schermata login
-        setAlreadyMember(p => ({...p, loading: false, error: "Hai già un account con password personalizzata. Usa il pulsante Accedi."}));
-      } else {
-        setAlreadyMember(p => ({...p, loading: false, error: "Errore: " + authError.message}));
-      }
-      return;
-    }
-    // Account creato — cerca atleta nel DB
-    const { data: existingList } = await supabase.from("athletes").select("id, email, user_id").ilike("email", email.trim());
-    const existing = existingList && existingList.length > 0 ? existingList[0] : null;
-    if (!existing) {
-      setAlreadyMember(p => ({...p, loading: false, error: "Email non trovata nel sistema. Assicurati di usare la stessa email che hai dato in segreteria."}));
-      return;
-    }
-    // Collega account all'atleta e forza cambio password
-    await supabase.from("athletes").update({ user_id: authData.user?.id }).eq("id", existing.id);
-    setMustChangePassword(true);
-    setAlreadyMember(p => ({...p, loading: false, success: true}));
-  }
-
   async function saveProfile() {
     const { error } = await supabase.from("athletes").update({
       email: profileForm.email,
