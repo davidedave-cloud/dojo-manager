@@ -1,4 +1,4 @@
-fimport { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { printModuloTesseramento } from "./printModulo.js";
 
 const BELT_COLORS = {
