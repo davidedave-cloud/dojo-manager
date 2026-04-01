@@ -126,7 +126,7 @@ export function ScreenAlreadyMember({ supabase, setScreen, setMustChangePassword
               <div style={{ fontSize: 13, color: "#5a5040", marginTop: 8, lineHeight: 1.6 }}>Se la segreteria ti ha già registrato, inserisci i tuoi dati per accedere al portale.</div>
             </div>
             <div style={{ marginBottom: 14 }}><label style={labelStyle}>La tua email *</label><input type="email" style={inputStyle} value={state.email} onChange={e => setState(p => ({...p, email: e.target.value}))} placeholder="la-tua@email.com" /></div>
-            <div style={{ marginBottom: 8 }}><label style={labelStyle}>Codice fiscale *</label><input style={{ ...inputStyle, textTransform: "uppercase" }} value={state.fiscalCode} onChange={e => setState(p => ({...p, fiscalCode: e.target.value}))} onKeyDown={e => e.key === "Enter" && handleSubmit()} placeholder="Per adulti: il tuo C.F. — Per minorenni: C.F. del genitore" maxLength={16} /></div>
+            <div style={{ marginBottom: 8 }}><label style={labelStyle}>Codice fiscale *</label><input style={{ ...inputStyle, textTransform: "uppercase" }} value={state.fiscalCode} onChange={e => setState(p => ({...p, fiscalCode: e.target.value}))} onKeyDown={e => e.key === "Enter" && handleSubmit()} placeholder="" maxLength={16} /></div>
             <div style={{ marginBottom: 20, fontSize: 11, color: "#5a5040", lineHeight: 1.6, padding: "8px 12px", background: "rgba(218,165,32,0.04)", borderRadius: 6, border: "1px solid #2a2010" }}>
               👤 Atleta adulto → inserisci il tuo codice fiscale<br/>
               👨‍👩‍👦 Minorenne o familiare → inserisci il codice fiscale del genitore
