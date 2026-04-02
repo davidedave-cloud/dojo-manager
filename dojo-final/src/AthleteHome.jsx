@@ -373,7 +373,7 @@ export function ScreenRegister({ supabase, setScreen }) {
         {regStep === 5 && (
           <div>
             <SectionTitle icon="🔐" title="Crea il tuo Account" />
-            <div style={{ marginBottom: 12 }}><label style={labelStyle}>Email *</label><input type="email" style={inputStyle} value={reg.email} readOnly style={{ ...inputStyle, opacity: 0.6 }} /></div>
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>Email *</label><input type="email" style={{ ...inputStyle, opacity: 0.6 }} value={reg.email} readOnly /></div>
             <div style={{ marginBottom: 12 }}><label style={labelStyle}>Password *</label><input type="password" style={inputStyle} value={reg.password} onChange={e => setField("password", e.target.value)} placeholder="Minimo 6 caratteri" /></div>
             <div style={{ marginBottom: 20 }}><label style={labelStyle}>Conferma Password *</label><input type="password" style={inputStyle} value={reg.confirm} onChange={e => setField("confirm", e.target.value)} placeholder="Ripeti la password" /></div>
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
