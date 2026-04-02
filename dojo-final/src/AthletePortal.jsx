@@ -17,30 +17,33 @@ export default function AthletePortal({ session, supabase }) {
   useEffect(() => { if (session) loadAthleteData(session.user.id); }, [session]);
 
   async function loadAthleteData(userId) {
-    const { data } = await supabase.from("athletes").select("*").eq("user_id", userId).single();
-    if (data) {
-      setAthlete(data);
-      setScreen("dashboard");
+  const { data } = await supabase.from("athletes").select("*").eq("user_id", userId).single();
+  if (data) {
+    setAthlete(data);
+    setScreen("dashboard");
 
-      // Determina l'ID "radice" famiglia:
-      // se l'atleta è un figlio (ha parent_athlete_id) usa quello,
-      // altrimenti usa il suo stesso id
-      const rootId = data.parent_athlete_id || data.id;
+    const rootId = data.parent_athlete_id || data.id;
 
-      const [p, n, e, fam, r] = await Promise.all([
-        supabase.from("payments").select("*").eq("athlete_id", data.id).order("created_at", { ascending: false }),
-        supabase.from("news").select("*").order("published_at", { ascending: false }),
-        supabase.from("event_participants").select("*, events(*)").eq("athlete_id", data.id),
-        supabase.from("athletes").select("*").eq("parent_athlete_id", rootId),
-        supabase.from("resources").select("*").order("created_at", { ascending: false }),
-      ]);
-      setPayments(p.data || []);
-      setNews(n.data || []);
-      setExams(e.data || []);
-      setFamilyMembers(fam.data || []);
-      setResources(r.data || []);
-    }
+    // Prima carica familiari per sapere i loro ID
+    const { data: famData } = await supabase.from("athletes").select("*").eq("parent_athlete_id", rootId);
+    const familiari = famData || [];
+    setFamilyMembers(familiari);
+
+    // Tutti gli ID della famiglia (atleta + familiari)
+    const allIds = [rootId, ...familiari.map(f => f.id)];
+
+    const [p, n, e, r] = await Promise.all([
+      supabase.from("payments").select("*, athletes(first_name, last_name, fiscal_code, is_minor, parent_name, parent_cf)").in("athlete_id", allIds).order("created_at", { ascending: false }),
+      supabase.from("news").select("*").order("published_at", { ascending: false }),
+      supabase.from("event_participants").select("*, events(*)").eq("athlete_id", data.id),
+      supabase.from("resources").select("*").order("created_at", { ascending: false }),
+    ]);
+    setPayments(p.data || []);
+    setNews(n.data || []);
+    setExams(e.data || []);
+    setResources(r.data || []);
   }
+}
 
   async function handleLogout() {
     await supabase.auth.signOut();
