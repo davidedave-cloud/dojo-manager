@@ -1,11 +1,8 @@
-// Service Worker — Cinque Cerchi ASD
-const CACHE_NAME = 'cinque-cerchi-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-];
+const CACHE_NAME = 'cinque-cerchi-' + self.__WB_MANIFEST_VERSION || Date.now();
+const urlsToCache = ['/', '/index.html'];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
