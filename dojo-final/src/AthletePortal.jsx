@@ -58,7 +58,7 @@ export default function AthletePortal({ session, supabase }) {
     const [p, n, e, r] = await Promise.all([
       supabase.from("payments").select("*, athletes(first_name, last_name, fiscal_code, is_minor, parent_name, parent_cf)").in("athlete_id", allIds).order("created_at", { ascending: false }),
       supabase.from("news").select("*").order("published_at", { ascending: false }),
-      supabase.from("event_participants").select("*, events(*)").eq("athlete_id", profile.id),
+      supabase.from("event_participants").select("*, events(*)").in("athlete_id", allIds),
       supabase.from("resources").select("*").order("created_at", { ascending: false }),
     ]);
     setPayments(p.data || []);

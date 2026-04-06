@@ -368,7 +368,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
             <div>
               <h2 style={{ color: "#daa520", marginBottom: 18, fontSize: 20 }}>Pagamenti & Ricevute</h2>
               {allMembers.map(m => {
-                const memberPayments = paidPayments.filter(p => p.athlete_id === m.id);
+                const memberPayments = paidPayments.filter(p => p.athlete_id === m.id).sort((a, b) => (a.period_year - b.period_year) || (a.period_month - b.period_month));
                 if (memberPayments.length === 0) return null;
                 return (
                   <div key={m.id} style={{ marginBottom: 28 }}>
@@ -410,29 +410,42 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
         {/* EVENTI */}
         {activeTab === "esami" && (
           <div>
-            <h2 style={{ color: "#daa520", marginBottom: 18, fontSize: 20 }}>🏆 I miei Eventi</h2>
-            {exams.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "60px 20px", color: "#5a5040", background: "#0d0c07", borderRadius: 14, border: "1px dashed #2a2010" }}>
-                <div style={{ fontSize: 36, marginBottom: 12 }}>🏆</div>
-                <div>Nessun evento in programma.</div>
-              </div>
-            ) : exams.map((ep, i) => {
-              const typeColors = { "Esame Cinture": "#daa520", "Gara": "#4a9eff", "Seminario": "#c084fc" };
-              const color = typeColors[ep.events?.event_type] || "#888";
+            <h2 style={{ color: "#daa520", marginBottom: 18, fontSize: 20 }}>🏆 Eventi</h2>
+            {[athlete, ...familyMembers].map(m => {
+              const memberExams = exams.filter(ep => ep.athlete_id === m.id).sort((a, b) => new Date(a.events?.event_date) - new Date(b.events?.event_date));
+              if (memberExams.length === 0) return null;
               return (
-                <div key={i} style={{ background: "#131008", border: `1px solid ${color}33`, borderRadius: 14, padding: 20, marginBottom: 14 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div>
-                      <div style={{ fontSize: 17, fontWeight: 700, color }}>{ep.events?.event_type}</div>
-                      <div style={{ fontSize: 13, color: "#8a7a6a", marginTop: 4 }}>{ep.events?.event_date ? new Date(ep.events.event_date).toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric" }) : ""}</div>
-                      {ep.events?.location && <div style={{ fontSize: 12, color: "#5a5040", marginTop: 2 }}>📍 {ep.events.location}</div>}
-                    </div>
-                    <span style={{ background: `${color}20`, color, border: `1px solid ${color}`, borderRadius: 99, padding: "4px 14px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>{ep.status === "iscritto" ? "✓ Iscritto" : ep.status === "promosso" ? "🎉 Promosso" : ep.status === "rimandato" ? "⏳ Rimandato" : ep.status}</span>
+                <div key={m.id} style={{ marginBottom: 28 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#daa520", marginBottom: 10, paddingBottom: 6, borderBottom: "1px solid #2a2010" }}>
+                    👤 {m.first_name} {m.last_name}
+                    {m.id === athlete.id && <span style={{ fontSize: 11, color: "#888", fontWeight: 400, marginLeft: 8 }}>— titolare</span>}
                   </div>
-                  {ep.new_belt && <div style={{ marginTop: 10 }}><span style={{ fontSize: 12, color: "#22c55e" }}>Nuova cintura: </span><BeltBadge belt={ep.new_belt} /></div>}
+                  {memberExams.map((ep, i) => {
+                    const typeColors = { "Esame Cinture": "#daa520", "Gara": "#4a9eff", "Seminario": "#c084fc" };
+                    const color = typeColors[ep.events?.event_type] || "#888";
+                    return (
+                      <div key={i} style={{ background: "#131008", border: `1px solid ${color}33`, borderRadius: 14, padding: 20, marginBottom: 10 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                          <div>
+                            <div style={{ fontSize: 15, fontWeight: 700, color }}>{ep.events?.event_type}</div>
+                            <div style={{ fontSize: 12, color: "#8a7a6a", marginTop: 4 }}>{ep.events?.event_date ? new Date(ep.events.event_date).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" }) : ""}</div>
+                            {ep.events?.location && <div style={{ fontSize: 11, color: "#5a5040", marginTop: 2 }}>📍 {ep.events.location}</div>}
+                          </div>
+                          <span style={{ background: `${color}20`, color, border: `1px solid ${color}`, borderRadius: 99, padding: "4px 12px", fontSize: 11, fontWeight: 700, whiteSpace: "nowrap" }}>{ep.status === "iscritto" ? "✓ Iscritto" : ep.status === "promosso" ? "🎉 Promosso" : ep.status === "rimandato" ? "⏳ Rimandato" : ep.status}</span>
+                        </div>
+                        {ep.new_belt && <div style={{ marginTop: 8 }}><span style={{ fontSize: 12, color: "#22c55e" }}>Nuova cintura: </span><BeltBadge belt={ep.new_belt} /></div>}
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}
+            {exams.length === 0 && (
+              <div style={{ textAlign: "center", padding: "60px 20px", color: "#5a5040", background: "#0d0c07", borderRadius: 14, border: "1px dashed #2a2010" }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>🏆</div>
+                <div>Nessun evento registrato.</div>
+              </div>
+            )}
           </div>
         )}
 
