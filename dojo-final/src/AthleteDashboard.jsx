@@ -189,7 +189,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {/* Selettore profilo — appare solo se ci sono più profili */}
-            {allProfiles && allProfiles.length > 1 && (
+            {allProfiles && allProfiles.length > 1 && allProfiles.every(p => p.referente_email) && (
               <div style={{ position: "relative" }}>
                 <select
                   value={activeProfile?.id || ""}
