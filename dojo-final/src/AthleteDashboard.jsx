@@ -93,7 +93,7 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, input
   );
 }
 
-export default function AthleteDashboard({ athlete, setAthlete, familyMembers, setFamilyMembers, allProfiles, activeProfile, switchProfile, payments, news, exams, resources, supabase, handleLogout }) {
+export default function AthleteDashboard({ athlete, setAthlete, familyMembers, setFamilyMembers, allProfiles, activeProfile, switchProfile, isReferente, payments, news, exams, resources, supabase, handleLogout }) {
   const [activeTab, setActiveTab] = useState("profilo");
   const [showAddMember, setShowAddMember] = useState(false);
   const [editProfile, setEditProfile] = useState(false);

@@ -12,6 +12,7 @@ export default function AthletePortal({ session, supabase }) {
   const [resources, setResources] = useState([]);
   const [mounted, setMounted] = useState(false);
   const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [isReferente, setIsReferente] = useState(false);
 
   // athlete e familyMembers derivati da allProfiles e activeProfile
   const athlete = activeProfile;
@@ -47,6 +48,7 @@ export default function AthletePortal({ session, supabase }) {
       if (refAthletes && refAthletes.length > 0) {
         setAllProfiles(refAthletes);
         setActiveProfile(refAthletes[0]);
+        setIsReferente(true);
         setScreen("dashboard");
         await loadProfileData(refAthletes[0], refAthletes);
       }
@@ -88,7 +90,7 @@ export default function AthletePortal({ session, supabase }) {
     <AthleteDashboard
       athlete={athlete} setAthlete={p => setActiveProfile(p)}
       familyMembers={familyMembers} setFamilyMembers={() => {}}
-      allProfiles={allProfiles} activeProfile={activeProfile} switchProfile={switchProfile}
+      allProfiles={allProfiles} activeProfile={activeProfile} switchProfile={switchProfile} isReferente={isReferente}
       payments={payments} news={news} exams={exams} resources={resources}
       supabase={supabase} handleLogout={handleLogout}
     />
