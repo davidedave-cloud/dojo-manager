@@ -295,39 +295,62 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
         )}
 
         {/* PAGAMENTI */}
-        {activeTab === "pagamenti" && (
-          <div>
-            <h2 style={{ color: "#daa520", marginBottom: 18, fontSize: 20 }}>Pagamenti & Ricevute</h2>
-            {payments.filter(p => p.status === "paid").length === 0
-              ? <div style={{ textAlign: "center", padding: 60, color: "#5a5040" }}>Nessun pagamento registrato.</div>
-              : payments.filter(p => p.status === "paid").map(p => {
-                const MONTHS = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
-                const label = p.payment_type === "annuale" ? `🎫 Tessera ${p.period_year}` : `📅 ${MONTHS[(p.period_month||1)-1]} ${p.period_year}`;
+        {activeTab === "pagamenti" && (() => {
+          const MONTHS = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+          const paidPayments = payments.filter(p => p.status === "paid");
+          const allMembers = [athlete, ...familyMembers];
+
+          function renderReceipt(p, memberAthlete) {
+            const win = window.open("", "_blank");
+            const mese = MONTHS[(p.period_month||1)-1];
+            const anno = p.period_year;
+            const causale = p.payment_type === "annuale" ? "Tessera associativa anno "+anno : "Quota mensile "+mese+" "+anno;
+            const receiptNum = (p.receipt_number||"").replace("RCV-","").replace("UPLOAD-","") || (p.id||"").slice(0,6).toUpperCase();
+            const dataStr = new Date(p.paid_at||Date.now()).toLocaleDateString("it-IT");
+            const logoUrl = "https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/assets/Karate%20Do%20copia.png";
+            const a = memberAthlete || athlete;
+            const intestatario = a.is_minor ? (a.parent_name || athlete.first_name+" "+athlete.last_name) : (a.first_name+" "+a.last_name);
+            const cf = a.is_minor ? (a.parent_cf || athlete.fiscal_code || "—") : (a.fiscal_code || "—");
+            const perAtleta = a.is_minor ? "<tr><td class='label'>PER ATLETA:</td><td>"+a.first_name+" "+a.last_name+"</td></tr>" : "";
+            win.document.write("<!DOCTYPE html><html lang='it'><head><meta charset='UTF-8'><title>Ricevuta "+receiptNum+"</title><style>@page{size:A4;margin:20mm}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11pt;color:#111;background:#fff}.page{max-width:700px;margin:0 auto;border:1px solid #ccc}.header{display:flex;align-items:center;padding:16px 20px;border-bottom:2px solid #1a1408;gap:16px}.logo-box{width:80px;height:80px;flex-shrink:0}.logo-box img{width:100%;height:100%;object-fit:contain}.org-info{font-size:9pt;color:#444;line-height:1.6}.org-name{font-weight:bold;font-size:10pt}.ricevuta-title{margin-left:auto;text-align:right}.ricevuta-title h1{font-size:28pt;font-weight:900;color:#111;letter-spacing:2px}.meta{display:flex;gap:30px;justify-content:flex-end;font-size:10pt;margin-top:4px}.body{padding:20px}table{width:100%;border-collapse:collapse}td{padding:8px 6px;border-bottom:1px solid #ddd;font-size:10pt}.label{color:#555;font-weight:bold;width:140px}.importo-box{background:#f5f5f5;border:1px solid #ddd;border-radius:4px;padding:12px 20px;margin:16px 0;text-align:center}.importo-lettere{font-size:14pt;font-style:italic;font-weight:bold}.totale{display:flex;justify-content:space-between;align-items:center;background:#1a1408;color:white;padding:14px 20px;margin-top:16px}.totale-label{font-size:13pt;font-weight:bold}.totale-value{font-size:16pt;font-weight:bold}.firma{display:flex;justify-content:flex-end;margin-top:30px;padding-right:20px}.firma-line{border-top:1px solid #333;width:200px;margin-top:40px}.firma-label{font-size:9pt;color:#555;margin-top:4px;text-align:center}</style></head><body><div class='page'><div class='header'><div class='logo-box'><img src='"+logoUrl+"'/></div><div class='org-info'><div class='org-name'>Associazione Sportiva Dilettantistica</div><div class='org-name'>CINQUE CERCHI</div><div>Sezione Karate-do Tradizionale</div><div>cinquecerchikaratedo@gmail.com</div></div><div class='ricevuta-title'><h1>RICEVUTA</h1><div class='meta'><span>DATA <strong>"+dataStr+"</strong></span><span>N. <strong>"+receiptNum+"</strong></span></div></div></div><div class='body'><table><tr><td class='label'>RICEVUTO DA:</td><td>"+intestatario+" <span style='font-size:9pt;color:#777'>C.F. "+cf+"</span></td></tr>"+perAtleta+"<tr><td class='label'>IMPORTO:</td><td><div class='importo-box'><span class='importo-lettere'>€ "+Number(p.amount).toFixed(2)+"</span></div></td></tr><tr><td class='label'>CAUSALE:</td><td>"+causale+"</td></tr></table><div class='totale'><span class='totale-label'>TOTALE</span><span class='totale-value'>€ "+Number(p.amount).toFixed(2)+"</span></div><div class='firma'><div><div class='firma-line'></div><div class='firma-label'>IL RICEVENTE</div></div></div></div></div><script>window.onload=()=>window.print();</script></body></html>");
+            win.document.close();
+          }
+
+          if (paidPayments.length === 0) return (
+            <div><h2 style={{ color: "#daa520", marginBottom: 18, fontSize: 20 }}>Pagamenti & Ricevute</h2><div style={{ textAlign: "center", padding: 60, color: "#5a5040" }}>Nessun pagamento registrato.</div></div>
+          );
+
+          return (
+            <div>
+              <h2 style={{ color: "#daa520", marginBottom: 18, fontSize: 20 }}>Pagamenti & Ricevute</h2>
+              {allMembers.map(m => {
+                const memberPayments = paidPayments.filter(p => p.athlete_id === m.id);
+                if (memberPayments.length === 0) return null;
                 return (
-                  <div key={p.id} style={{ background: "#131008", border: "1px solid #2a2010", borderRadius: 12, padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, gap: 12 }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: "#e8e0d0" }}>{label}</div>
-                      <div style={{ fontSize: 11, color: "#5a5040", marginTop: 2 }}>{p.receipt_number} · {p.paid_at ? new Date(p.paid_at).toLocaleDateString("it-IT") : ""}</div>
+                  <div key={m.id} style={{ marginBottom: 28 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#daa520", marginBottom: 10, paddingBottom: 6, borderBottom: "1px solid #2a2010" }}>
+                      👤 {m.first_name} {m.last_name}
+                      {m.id === athlete.id && <span style={{ fontSize: 11, color: "#888", fontWeight: 400, marginLeft: 8 }}>— titolare</span>}
                     </div>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: "#daa520" }}>€{p.amount}</span>
-                    <button onClick={() => {
-                      const win = window.open("", "_blank");
-                      const MONTHS2 = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
-                      const mese = MONTHS2[(p.period_month||1)-1];
-                      const anno = p.period_year;
-                      const stagione = (p.period_month >= 9) ? (anno+"/"+(anno+1)) : ((anno-1)+"/"+anno);
-                      const causale = p.payment_type === "annuale" ? "Tessera associativa anno "+anno : "Quota mensile "+mese+" "+anno;
-                      const receiptNum = (p.receipt_number||"").replace("RCV-","").replace("UPLOAD-","") || (p.id||"").slice(0,6).toUpperCase();
-                      const dataStr = new Date(p.paid_at||Date.now()).toLocaleDateString("it-IT");
-                      const logoUrl = "https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/assets/Karate%20Do%20copia.png";
-                      win.document.write("<!DOCTYPE html><html lang='it'><head><meta charset='UTF-8'><title>Ricevuta "+receiptNum+"</title><style>@page{size:A4;margin:20mm}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11pt;color:#111;background:#fff}.page{max-width:700px;margin:0 auto;border:1px solid #ccc}.header{display:flex;align-items:center;padding:16px 20px;border-bottom:2px solid #1a1408;gap:16px}.logo-box{width:80px;height:80px;flex-shrink:0}.logo-box img{width:100%;height:100%;object-fit:contain}.org-info{font-size:9pt;color:#444;line-height:1.6}.org-name{font-weight:bold;font-size:10pt}.ricevuta-title{margin-left:auto;text-align:right}.ricevuta-title h1{font-size:28pt;font-weight:900;color:#111;letter-spacing:2px}.meta{display:flex;gap:30px;justify-content:flex-end;font-size:10pt;margin-top:4px}.body{padding:20px}table{width:100%;border-collapse:collapse}td{padding:8px 6px;border-bottom:1px solid #ddd;font-size:10pt}.label{color:#555;font-weight:bold;width:140px}.importo-box{background:#f5f5f5;border:1px solid #ddd;border-radius:4px;padding:12px 20px;margin:16px 0;text-align:center}.importo-lettere{font-size:14pt;font-style:italic;font-weight:bold}.totale{display:flex;justify-content:space-between;align-items:center;background:#1a1408;color:white;padding:14px 20px;margin-top:16px}.totale-label{font-size:13pt;font-weight:bold}.totale-value{font-size:16pt;font-weight:bold}.firma{display:flex;justify-content:flex-end;margin-top:30px;padding-right:20px}.firma-line{border-top:1px solid #333;width:200px;margin-top:40px}.firma-label{font-size:9pt;color:#555;margin-top:4px;text-align:center}</style></head><body><div class='page'><div class='header'><div class='logo-box'><img src='"+logoUrl+"' alt='Logo'/></div><div class='org-info'><div class='org-name'>Associazione Sportiva Dilettantistica</div><div class='org-name'>CINQUE CERCHI</div><div>Sezione Karate-do Tradizionale</div><div>cinquecerchikaratedo@gmail.com</div></div><div class='ricevuta-title'><h1>RICEVUTA</h1><div class='meta'><span>DATA <strong>"+dataStr+"</strong></span><span>N. <strong>"+receiptNum+"</strong></span></div></div></div><div class='body'><table><tr><td class='label'>RICEVUTO DA:</td><td>"+athlete.first_name+" "+athlete.last_name+" <span style='font-size:9pt;color:#777'>C.F. "+(athlete.fiscal_code||"—")+"</span></td></tr><tr><td class='label'>IMPORTO:</td><td><div class='importo-box'><span class='importo-lettere'>€ "+Number(p.amount).toFixed(2)+"</span></div></td></tr><tr><td class='label'>CAUSALE:</td><td>"+causale+"</td></tr></table><div class='totale'><span class='totale-label'>TOTALE</span><span class='totale-value'>€ "+Number(p.amount).toFixed(2)+"</span></div><div class='firma'><div><div class='firma-line'></div><div class='firma-label'>IL RICEVENTE</div></div></div></div></div><script>window.onload=()=>window.print();</script></body></html>");
-                      win.document.close();
-                    }} style={{ background: "rgba(74,158,255,0.15)", color: "#4a9eff", border: "1px solid #4a9eff", borderRadius: 8, padding: "7px 12px", cursor: "pointer", fontSize: 11, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄 Ricevuta</button>
+                    {memberPayments.map(p => {
+                      const label = p.payment_type === "annuale" ? `🎫 Tessera ${p.period_year}` : `📅 ${MONTHS[(p.period_month||1)-1]} ${p.period_year}`;
+                      return (
+                        <div key={p.id} style={{ background: "#131008", border: "1px solid #2a2010", borderRadius: 12, padding: "14px 18px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, gap: 12 }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: "#e8e0d0" }}>{label}</div>
+                            <div style={{ fontSize: 11, color: "#5a5040", marginTop: 2 }}>{p.receipt_number} · {p.paid_at ? new Date(p.paid_at).toLocaleDateString("it-IT") : ""}</div>
+                          </div>
+                          <span style={{ fontSize: 16, fontWeight: 700, color: "#daa520" }}>€{p.amount}</span>
+                          <button onClick={() => renderReceipt(p, m)} style={{ background: "rgba(74,158,255,0.15)", color: "#4a9eff", border: "1px solid #4a9eff", borderRadius: 8, padding: "7px 12px", cursor: "pointer", fontSize: 11, fontFamily: "inherit", whiteSpace: "nowrap" }}>📄 Ricevuta</button>
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })}
-          </div>
-        )}
+            </div>
+          );
+        })()}
 
         {/* DOCUMENTI */}
         {activeTab === "documenti" && (
