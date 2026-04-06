@@ -189,7 +189,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {/* Selettore profilo — appare solo se ci sono più profili */}
-            {allProfiles && allProfiles.length > 1 && allProfiles.every(p => p.referente_email) && (
+            {allProfiles && allProfiles.length > 1 && (
               <div style={{ position: "relative" }}>
                 <select
                   value={activeProfile?.id || ""}
@@ -296,6 +296,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
                       {m.medical_expiry && <div style={{ fontSize: 11, color: "#5a5040", marginTop: 3 }}>🏥 Cert. scade: {new Date(m.medical_expiry).toLocaleDateString("it-IT")}</div>}
                     </div>
                   </div>
+                  <button onClick={() => printModuloTesseramento(m, "2025/2026")} style={{ background: "rgba(218,165,32,0.1)", color: "#daa520", border: "1px solid rgba(218,165,32,0.3)", borderRadius: 8, padding: "7px 14px", cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>🖨️ Modulo</button>
                   <button onClick={() => { setEditMember(m); setEditMemberForm({ first_name: m.first_name, last_name: m.last_name, birth_date: m.birth_date || "", birth_place: m.birth_place || "", fiscal_code: m.fiscal_code || "", course: m.course, location: m.location, medical_expiry: m.medical_expiry || "", notes: m.notes || "" }); }} style={{ background: "rgba(74,158,255,0.15)", color: "#4a9eff", border: "1px solid #4a9eff", borderRadius: 8, padding: "7px 14px", cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>✏️ Modifica</button>
                 </div>
                 {editMember?.id === m.id && (
