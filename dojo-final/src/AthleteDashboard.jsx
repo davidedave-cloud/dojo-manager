@@ -189,7 +189,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {/* Selettore profilo — appare solo se ci sono più profili */}
-            {allProfiles && allProfiles.length > 1 && (
+            {isReferente && allProfiles && allProfiles.length > 1 && (
               <div style={{ position: "relative" }}>
                 <select
                   value={activeProfile?.id || ""}
@@ -412,7 +412,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
           <div>
             <h2 style={{ color: "#daa520", marginBottom: 18, fontSize: 20 }}>🏆 Eventi</h2>
             {[athlete, ...familyMembers].map(m => {
-              const memberExams = exams.filter(ep => ep.athlete_id === m.id).sort((a, b) => new Date(a.events?.event_date) - new Date(b.events?.event_date));
+              const memberExams = exams.filter(ep => (ep.athlete_id === m.id) || (ep.athletes?.id === m.id)).sort((a, b) => new Date(a.events?.event_date) - new Date(b.events?.event_date));
               if (memberExams.length === 0) return null;
               return (
                 <div key={m.id} style={{ marginBottom: 28 }}>
