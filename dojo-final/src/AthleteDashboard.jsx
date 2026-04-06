@@ -7,7 +7,8 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, input
   const [uploading, setUploading] = React.useState(false);
   const [showForm, setShowForm] = React.useState(false);
   const [newDate, setNewDate] = React.useState("");
-  const [file, setFile] = React.useState(null);
+  const [fileAnagrafica, setFileAnagrafica] = React.useState(null);
+  const [fileCert, setFileCert] = React.useState(null);
 
   const oggi = new Date();
   const scadenza = m.medical_expiry ? new Date(m.medical_expiry) : null;
@@ -16,20 +17,35 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, input
   const statoTesto = !scadenza ? "Nessun certificato" : giorniRimasti < 0 ? "❌ Scaduto" : giorniRimasti < 30 ? `⚠️ Scade tra ${giorniRimasti} giorni` : `✅ Valido fino al ${scadenza.toLocaleDateString("it-IT")}`;
 
   async function uploadCert() {
-    if (!newDate) { alert("Inserisci la data di scadenza."); return; }
+    if (!newDate) { alert("Inserisci la data di scadenza del certificato."); return; }
     setUploading(true);
-    let filePath = null;
-    if (file) {
-      const ext = file.name.split(".").pop();
-      filePath = `certificati/${m.id}-${Date.now()}.${ext}`;
-      const { error: uploadErr } = await supabase.storage.from("pagamenti").upload(filePath, file);
-      if (uploadErr) { alert("Errore upload: " + uploadErr.message); setUploading(false); return; }
+    const cognome = m.last_name.toLowerCase().replace(/\s+/g, "-");
+    const nome = m.first_name.toLowerCase().replace(/\s+/g, "-");
+    let pathAnagrafica = null;
+    let pathCert = null;
+
+    if (fileAnagrafica) {
+      const ext = fileAnagrafica.name.split(".").pop();
+      pathAnagrafica = "certificati/" + cognome + "-" + nome + "-anagrafica." + ext;
+      await supabase.storage.from("pagamenti").remove([pathAnagrafica]);
+      const { error } = await supabase.storage.from("pagamenti").upload(pathAnagrafica, fileAnagrafica);
+      if (error) { alert("Errore upload anagrafica: " + error.message); setUploading(false); return; }
     }
-    await supabase.from("athletes").update({
-      medical_expiry: newDate,
-      ...(filePath ? { medical_file: filePath } : {}),
-    }).eq("id", m.id);
-    setShowForm(false); setFile(null); setNewDate("");
+
+    if (fileCert) {
+      const ext = fileCert.name.split(".").pop();
+      pathCert = "certificati/" + cognome + "-" + nome + "-cert-" + newDate + "." + ext;
+      await supabase.storage.from("pagamenti").remove([pathCert]);
+      const { error } = await supabase.storage.from("pagamenti").upload(pathCert, fileCert);
+      if (error) { alert("Errore upload certificato: " + error.message); setUploading(false); return; }
+    }
+
+    const update = { medical_expiry: newDate };
+    if (pathCert) update.medical_file = pathCert;
+    if (pathAnagrafica) update.medical_file_anagrafica = pathAnagrafica;
+    await supabase.from("athletes").update(update).eq("id", m.id);
+
+    setShowForm(false); setFileCert(null); setFileAnagrafica(null); setNewDate("");
     const { data: fam } = await supabase.from("athletes").select("*").eq("parent_athlete_id", athleteId);
     setFamilyMembers(fam || []);
     setUploading(false);
@@ -51,15 +67,22 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, input
       </div>
       {showForm && (
         <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid #2a2010" }}>
+          <div style={{ marginBottom: 14, padding: "10px 14px", background: "rgba(218,165,32,0.04)", border: "1px solid #2a2010", borderRadius: 8, fontSize: 12, color: "#8a7a6a", lineHeight: 1.6 }}>
+            Se hai solo il certificato medico senza libretto, caricalo solo nel secondo campo.
+          </div>
+          <div style={{ marginBottom: 14 }}>
+            <label style={labelStyle}>📋 Pagina anagrafica libretto verde (opzionale)</label>
+            <input type="file" accept="image/*,.pdf" onChange={e => setFileAnagrafica(e.target.files[0])} style={{ ...inputStyle, padding: "8px 12px" }} />
+          </div>
           <div style={{ marginBottom: 12 }}>
             <label style={labelStyle}>Data scadenza certificato *</label>
             <input type="date" style={inputStyle} value={newDate} onChange={e => setNewDate(e.target.value)} />
           </div>
-          <div style={{ marginBottom: 16 }}>
-            <label style={labelStyle}>Foto/PDF certificato (opzionale)</label>
-            <input type="file" accept="image/*,.pdf" onChange={e => setFile(e.target.files[0])} style={{ ...inputStyle, padding: "8px 12px" }} />
-            <div style={{ fontSize: 11, color: "#5a5040", marginTop: 4 }}>Formati accettati: JPG, PNG, PDF</div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={labelStyle}>🏥 Certificato medico</label>
+            <input type="file" accept="image/*,.pdf" onChange={e => setFileCert(e.target.files[0])} style={{ ...inputStyle, padding: "8px 12px" }} />
           </div>
+          <div style={{ fontSize: 11, color: "#5a5040", marginBottom: 14 }}>Formati accettati: JPG, PNG, PDF</div>
           <div style={{ display: "flex", gap: 10 }}>
             <button onClick={uploadCert} disabled={uploading} style={{ flex: 1, background: "linear-gradient(135deg,#b8860b,#daa520)", color: "#0a0905", border: "none", borderRadius: 8, padding: "11px", cursor: "pointer", fontWeight: 700, fontSize: 13, fontFamily: "inherit" }}>{uploading ? "Caricamento..." : "✓ Salva"}</button>
             <button onClick={() => setShowForm(false)} style={{ background: "#1a1408", color: "#8a7a6a", border: "1px solid #2a2010", borderRadius: 8, padding: "11px 18px", cursor: "pointer", fontFamily: "inherit" }}>Annulla</button>
