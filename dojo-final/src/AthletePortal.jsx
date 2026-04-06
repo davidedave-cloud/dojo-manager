@@ -4,8 +4,8 @@ import AthleteDashboard from "./AthleteDashboard.jsx";
 
 export default function AthletePortal({ session, supabase }) {
   const [screen, setScreen] = useState("home");
-  const [athlete, setAthlete] = useState(null);
-  const [familyMembers, setFamilyMembers] = useState([]);
+  const [allProfiles, setAllProfiles] = useState([]); // tutti i profili della famiglia
+  const [activeProfile, setActiveProfile] = useState(null); // profilo attivo
   const [payments, setPayments] = useState([]);
   const [news, setNews] = useState([]);
   const [exams, setExams] = useState([]);
@@ -13,29 +13,52 @@ export default function AthletePortal({ session, supabase }) {
   const [mounted, setMounted] = useState(false);
   const [mustChangePassword, setMustChangePassword] = useState(false);
 
+  // athlete e familyMembers derivati da allProfiles e activeProfile
+  const athlete = activeProfile;
+  const familyMembers = allProfiles.filter(p => p.id !== activeProfile?.id);
+
   useEffect(() => { setTimeout(() => setMounted(true), 50); }, []);
   useEffect(() => { if (session) loadAthleteData(session.user.id); }, [session]);
 
   async function loadAthleteData(userId) {
-  const { data } = await supabase.from("athletes").select("*").eq("user_id", userId).single();
-  if (data) {
-    setAthlete(data);
-    setScreen("dashboard");
+    // 1. Cerca atleta per user_id
+    const { data: mainAthlete } = await supabase.from("athletes").select("*").eq("user_id", userId).single();
 
-    const rootId = data.parent_athlete_id || data.id;
+    if (mainAthlete) {
+      // 2. Carica tutti i profili della famiglia
+      const rootId = mainAthlete.parent_athlete_id || mainAthlete.id;
+      const { data: famData } = await supabase.from("athletes").select("*").eq("parent_athlete_id", rootId);
+      const familiari = famData || [];
 
-    // Prima carica familiari per sapere i loro ID
-    const { data: famData } = await supabase.from("athletes").select("*").eq("parent_athlete_id", rootId);
-    const familiari = famData || [];
-    setFamilyMembers(familiari);
+      // Profili: titolare + familiari
+      const profiles = [mainAthlete, ...familiari];
+      setAllProfiles(profiles);
+      setActiveProfile(mainAthlete);
+      setScreen("dashboard");
+      await loadProfileData(mainAthlete, profiles);
 
-    // Tutti gli ID della famiglia (atleta + familiari)
-    const allIds = [rootId, ...familiari.map(f => f.id)];
+    } else {
+      // 3. Cerca per referente_email (genitori non praticanti)
+      const { data: sessionData } = await supabase.auth.getUser();
+      const email = sessionData?.user?.email;
+      if (!email) return;
 
+      const { data: refAthletes } = await supabase.from("athletes").select("*").eq("referente_email", email);
+      if (refAthletes && refAthletes.length > 0) {
+        setAllProfiles(refAthletes);
+        setActiveProfile(refAthletes[0]);
+        setScreen("dashboard");
+        await loadProfileData(refAthletes[0], refAthletes);
+      }
+    }
+  }
+
+  async function loadProfileData(profile, profiles) {
+    const allIds = profiles.map(p => p.id);
     const [p, n, e, r] = await Promise.all([
       supabase.from("payments").select("*, athletes(first_name, last_name, fiscal_code, is_minor, parent_name, parent_cf)").in("athlete_id", allIds).order("created_at", { ascending: false }),
       supabase.from("news").select("*").order("published_at", { ascending: false }),
-      supabase.from("event_participants").select("*, events(*)").eq("athlete_id", data.id),
+      supabase.from("event_participants").select("*, events(*)").eq("athlete_id", profile.id),
       supabase.from("resources").select("*").order("created_at", { ascending: false }),
     ]);
     setPayments(p.data || []);
@@ -43,11 +66,17 @@ export default function AthletePortal({ session, supabase }) {
     setExams(e.data || []);
     setResources(r.data || []);
   }
-}
+
+  async function switchProfile(profile) {
+    setActiveProfile(profile);
+    // Ricarica eventi per il nuovo profilo attivo
+    const { data: e } = await supabase.from("event_participants").select("*, events(*)").eq("athlete_id", profile.id);
+    setExams(e || []);
+  }
 
   async function handleLogout() {
     await supabase.auth.signOut();
-    setAthlete(null); setFamilyMembers([]); setScreen("home");
+    setAllProfiles([]); setActiveProfile(null); setScreen("home");
   }
 
   if (mustChangePassword) return <ScreenChangePassword supabase={supabase} setMustChangePassword={setMustChangePassword} />;
@@ -57,8 +86,9 @@ export default function AthletePortal({ session, supabase }) {
   if (screen === "register") return <ScreenRegister supabase={supabase} setScreen={setScreen} />;
   if (screen === "dashboard" && athlete) return (
     <AthleteDashboard
-      athlete={athlete} setAthlete={setAthlete}
-      familyMembers={familyMembers} setFamilyMembers={setFamilyMembers}
+      athlete={athlete} setAthlete={p => setActiveProfile(p)}
+      familyMembers={familyMembers} setFamilyMembers={() => {}}
+      allProfiles={allProfiles} activeProfile={activeProfile} switchProfile={switchProfile}
       payments={payments} news={news} exams={exams} resources={resources}
       supabase={supabase} handleLogout={handleLogout}
     />

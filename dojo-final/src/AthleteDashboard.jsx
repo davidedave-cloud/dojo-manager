@@ -93,7 +93,7 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, input
   );
 }
 
-export default function AthleteDashboard({ athlete, setAthlete, familyMembers, setFamilyMembers, payments, news, exams, resources, supabase, handleLogout }) {
+export default function AthleteDashboard({ athlete, setAthlete, familyMembers, setFamilyMembers, allProfiles, activeProfile, switchProfile, payments, news, exams, resources, supabase, handleLogout }) {
   const [activeTab, setActiveTab] = useState("profilo");
   const [showAddMember, setShowAddMember] = useState(false);
   const [editProfile, setEditProfile] = useState(false);
@@ -187,8 +187,28 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
             <div style={{ fontSize: 26 }}>🥋</div>
             <div><div style={{ fontSize: 16, fontWeight: 700, color: "#daa520" }}>DOJO KARATE</div><div style={{ fontSize: 11, color: "#5a5040" }}>AREA ATLETA</div></div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ textAlign: "right" }}><div style={{ fontSize: 13, color: "#e8e0d0" }}>{athlete.first_name} {athlete.last_name}</div><div style={{ marginTop: 2 }}><BeltBadge belt={athlete.belt} /></div></div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {/* Selettore profilo — appare solo se ci sono più profili */}
+            {allProfiles && allProfiles.length > 1 && (
+              <div style={{ position: "relative" }}>
+                <select
+                  value={activeProfile?.id || ""}
+                  onChange={e => {
+                    const p = allProfiles.find(x => x.id === e.target.value);
+                    if (p) switchProfile(p);
+                  }}
+                  style={{ background: "#1a1408", border: "1px solid #b8860b", borderRadius: 8, padding: "7px 12px", color: "#daa520", fontFamily: "inherit", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                >
+                  {allProfiles.map(p => (
+                    <option key={p.id} value={p.id}>{p.first_name} {p.last_name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 13, color: "#e8e0d0" }}>{athlete.first_name} {athlete.last_name}</div>
+              {athlete.belt && <div style={{ marginTop: 2 }}><BeltBadge belt={athlete.belt} /></div>}
+            </div>
             <button onClick={handleLogout} style={{ background: "transparent", color: "#5a5040", border: "1px solid #2a2010", borderRadius: 8, padding: "7px 14px", cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>Esci</button>
           </div>
         </div>
