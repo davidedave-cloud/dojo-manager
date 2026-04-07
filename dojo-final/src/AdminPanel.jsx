@@ -767,14 +767,20 @@ export default function AdminPanel({ session, supabase }) {
                 <div style={{ fontSize: 12, color: "#c084fc", fontWeight: 700, marginBottom: 10 }}>📋 Documenti caricati dall'atleta</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {selectedAthlete.medical_file_anagrafica && (
-                    <a href={`https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/pagamenti/${selectedAthlete.medical_file_anagrafica}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#c084fc", textDecoration: "none", background: "rgba(192,132,252,0.1)", padding: "6px 12px", borderRadius: 6, display: "inline-block" }}>
+                    <button onClick={async () => {
+                      const { data } = await supabase.storage.from("pagamenti").createSignedUrl(selectedAthlete.medical_file_anagrafica, 60);
+                      if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                    }} style={{ fontSize: 12, color: "#c084fc", textDecoration: "none", background: "rgba(192,132,252,0.1)", padding: "6px 12px", borderRadius: 6, display: "inline-block", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
                       📋 Pagina anagrafica libretto verde →
-                    </a>
+                    </button>
                   )}
                   {selectedAthlete.medical_file && (
-                    <a href={`https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/pagamenti/${selectedAthlete.medical_file}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#c084fc", textDecoration: "none", background: "rgba(192,132,252,0.1)", padding: "6px 12px", borderRadius: 6, display: "inline-block" }}>
+                    <button onClick={async () => {
+                      const { data } = await supabase.storage.from("pagamenti").createSignedUrl(selectedAthlete.medical_file, 60);
+                      if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                    }} style={{ fontSize: 12, color: "#c084fc", textDecoration: "none", background: "rgba(192,132,252,0.1)", padding: "6px 12px", borderRadius: 6, display: "inline-block", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
                       🏥 Certificato medico →
-                    </a>
+                    </button>
                   )}
                 </div>
                 <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 10 }}>
