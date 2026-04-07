@@ -69,6 +69,30 @@ export default function AthletePortal({ session, supabase }) {
     setResources(r.data || []);
   }
 
+  async function reloadProfiles() {
+    if (!session) return;
+    const { data: mainAthlete } = await supabase.from("athletes").select("*").eq("user_id", session.user.id).single();
+    if (mainAthlete) {
+      const rootId = mainAthlete.parent_athlete_id || mainAthlete.id;
+      const { data: famData } = await supabase.from("athletes").select("*").eq("parent_athlete_id", rootId);
+      const profiles = [mainAthlete, ...(famData || [])];
+      setAllProfiles(profiles);
+      // Aggiorna anche il profilo attivo con i dati freschi
+      const updated = profiles.find(p => p.id === activeProfile?.id);
+      if (updated) setActiveProfile(updated);
+    } else {
+      const { data: sessionData } = await supabase.auth.getUser();
+      const email = sessionData?.user?.email;
+      if (!email) return;
+      const { data: refAthletes } = await supabase.from("athletes").select("*").eq("referente_email", email);
+      if (refAthletes && refAthletes.length > 0) {
+        setAllProfiles(refAthletes);
+        const updated = refAthletes.find(p => p.id === activeProfile?.id);
+        if (updated) setActiveProfile(updated);
+      }
+    }
+  }
+
   async function switchProfile(profile) {
     setActiveProfile(profile);
     // Ricarica eventi per il nuovo profilo attivo
@@ -92,7 +116,7 @@ export default function AthletePortal({ session, supabase }) {
       familyMembers={familyMembers} setFamilyMembers={() => {}}
       allProfiles={allProfiles} activeProfile={activeProfile} switchProfile={switchProfile} isReferente={isReferente}
       payments={payments} news={news} exams={exams} resources={resources}
-      supabase={supabase} handleLogout={handleLogout}
+      supabase={supabase} handleLogout={handleLogout} reloadProfiles={reloadProfiles}
     />
   );
   return null;

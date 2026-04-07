@@ -3,7 +3,7 @@ import { printModuloTesseramento } from "./printModulo.js";
 import { BeltBadge, BeltProgress, inputStyle, labelStyle } from "./AthleteComponents.jsx";
 import { AddMemberModal } from "./AthleteComponents.jsx";
 
-function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, inputStyle, labelStyle }) {
+function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, reloadProfiles, inputStyle, labelStyle }) {
   const [uploading, setUploading] = React.useState(false);
   const [showForm, setShowForm] = React.useState(false);
   const [newDate, setNewDate] = React.useState("");
@@ -46,6 +46,7 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, input
     setShowForm(false); setFileCert(null); setFileAnagrafica(null); setNewDate("");
     const { data: fam } = await supabase.from("athletes").select("*").eq("parent_athlete_id", athleteId);
     setFamilyMembers(fam || []);
+    if (reloadProfiles) await reloadProfiles();
     setUploading(false);
   }
 
@@ -91,7 +92,7 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, input
   );
 }
 
-export default function AthleteDashboard({ athlete, setAthlete, familyMembers, setFamilyMembers, allProfiles, activeProfile, switchProfile, isReferente, payments, news, exams, resources, supabase, handleLogout }) {
+export default function AthleteDashboard({ athlete, setAthlete, familyMembers, setFamilyMembers, allProfiles, activeProfile, switchProfile, isReferente, payments, news, exams, resources, supabase, handleLogout, reloadProfiles }) {
   const [activeTab, setActiveTab] = useState("profilo");
   const [showAddMember, setShowAddMember] = useState(false);
   const [editProfile, setEditProfile] = useState(false);
@@ -401,7 +402,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
             <h2 style={{ color: "#daa520", marginBottom: 8, fontSize: 20 }}>📋 Certificati Medici</h2>
             <div style={{ fontSize: 13, color: "#5a5040", marginBottom: 24, lineHeight: 1.7 }}>Carica il certificato medico sportivo per te e per i tuoi familiari. Il Sensei verificherà i documenti.</div>
             {[athlete, ...familyMembers].map(m => (
-              <CertificatoCard key={m.id} m={m} isMe={m.id === athlete.id} supabase={supabase} athleteId={athlete.id} setFamilyMembers={setFamilyMembers} inputStyle={inputStyle} labelStyle={labelStyle} />
+              <CertificatoCard key={m.id} m={m} isMe={m.id === athlete.id} supabase={supabase} athleteId={athlete.id} setFamilyMembers={setFamilyMembers} reloadProfiles={reloadProfiles} inputStyle={inputStyle} labelStyle={labelStyle} />
             ))}
           </div>
         )}
