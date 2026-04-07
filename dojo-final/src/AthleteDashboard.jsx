@@ -46,8 +46,8 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, reloa
     setShowForm(false); setFileCert(null); setFileAnagrafica(null); setNewDate("");
     const { data: fam } = await supabase.from("athletes").select("*").eq("parent_athlete_id", athleteId);
     setFamilyMembers(fam || []);
-    if (reloadProfiles) await reloadProfiles();
     setUploading(false);
+    window.location.reload();
   }
 
   return (
