@@ -351,6 +351,20 @@ export default function AdminPanel({ session, supabase }) {
                 <button onClick={() => setActiveTab("Pagamenti")} style={{ background: "linear-gradient(135deg,#1E3A8A,#4a9eff)", color: "#fff", border: "none", borderRadius: 8, padding: "7px 16px", cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "inherit" }}>Verifica ora</button>
               </div>
             )}
+            {/* Alert certificati caricati da verificare */}
+            {(() => {
+              const daVerificare = athletes.filter(a => (a.medical_file || a.medical_file_anagrafica) && !a.medical_verified && a.status !== "suspended");
+              if (daVerificare.length === 0) return null;
+              return (
+                <div style={{ background: "rgba(192,132,252,0.08)", border: "1px solid rgba(192,132,252,0.3)", borderRadius: 12, padding: "14px 20px", marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ color: "#c084fc", fontSize: 14, fontWeight: 700, marginBottom: 6 }}>📋 {daVerificare.length} certificato{daVerificare.length > 1 ? "i" : ""} da verificare</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{daVerificare.map(a => <span key={a.id} style={{ fontSize: 12, color: "#c084fc", background: "rgba(192,132,252,0.1)", padding: "3px 10px", borderRadius: 99 }}>{a.first_name} {a.last_name}</span>)}</div>
+                  </div>
+                  <button onClick={() => setActiveTab("Atleti")} style={{ background: "linear-gradient(135deg,#7c3aed,#c084fc)", color: "#fff", border: "none", borderRadius: 8, padding: "7px 16px", cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "inherit", flexShrink: 0 }}>Verifica</button>
+                </div>
+              );
+            })()}
             {/* Alert certificati in scadenza */}
             {(() => {
               const today = new Date();
@@ -745,6 +759,45 @@ export default function AdminPanel({ session, supabase }) {
                     <div style={{ display: "flex", gap: 6 }}><BeltBadge belt={m.belt} /><StatusBadge status={m.status} /></div>
                   </div>
                 ))}
+              </div>
+            )}
+            {/* Sezione certificati */}
+            {(selectedAthlete.medical_file || selectedAthlete.medical_file_anagrafica) && (
+              <div style={{ marginTop: 16, background: "rgba(192,132,252,0.06)", border: "1px solid rgba(192,132,252,0.2)", borderRadius: 10, padding: "14px 16px" }}>
+                <div style={{ fontSize: 12, color: "#c084fc", fontWeight: 700, marginBottom: 10 }}>📋 Documenti caricati dall'atleta</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {selectedAthlete.medical_file_anagrafica && (
+                    <a href={`https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/pagamenti/${selectedAthlete.medical_file_anagrafica}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#c084fc", textDecoration: "none", background: "rgba(192,132,252,0.1)", padding: "6px 12px", borderRadius: 6, display: "inline-block" }}>
+                      📋 Pagina anagrafica libretto verde →
+                    </a>
+                  )}
+                  {selectedAthlete.medical_file && (
+                    <a href={`https://ccllvcdtehvbjroawomz.supabase.co/storage/v1/object/public/pagamenti/${selectedAthlete.medical_file}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#c084fc", textDecoration: "none", background: "rgba(192,132,252,0.1)", padding: "6px 12px", borderRadius: 6, display: "inline-block" }}>
+                      🏥 Certificato medico →
+                    </a>
+                  )}
+                </div>
+                <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 10 }}>
+                  {selectedAthlete.medical_verified
+                    ? <span style={{ fontSize: 12, color: "#22c55e" }}>✅ Verificato</span>
+                    : <button onClick={async () => {
+                        await supabase.from("athletes").update({ medical_verified: true }).eq("id", selectedAthlete.id);
+                        await loadData();
+                        setSelectedAthlete(prev => ({...prev, medical_verified: true}));
+                      }} style={{ background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid #22c55e", borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>
+                        ✓ Segna come verificato
+                      </button>
+                  }
+                  {selectedAthlete.medical_verified && (
+                    <button onClick={async () => {
+                      await supabase.from("athletes").update({ medical_verified: false }).eq("id", selectedAthlete.id);
+                      await loadData();
+                      setSelectedAthlete(prev => ({...prev, medical_verified: false}));
+                    }} style={{ background: "none", border: "none", color: "#555", fontSize: 11, cursor: "pointer", fontFamily: "inherit" }}>
+                      Annulla verifica
+                    </button>
+                  )}
+                </div>
               </div>
             )}
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
