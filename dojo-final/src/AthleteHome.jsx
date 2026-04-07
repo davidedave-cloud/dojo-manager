@@ -234,6 +234,7 @@ export function ScreenRegister({ supabase, setScreen }) {
         medical_expiry: reg.medicalExpiry,
         how_found: reg.howFound === "Altro" ? reg.howFoundOther : reg.howFound,
         notes: reg.notes, status: "pending", gdpr_consent: reg.gdpr, gdpr_marketing: reg.gdprMarketing,
+        start_date: `${String(new Date().getMonth()+1).padStart(2,"0")}/${new Date().getFullYear()}`,
       });
       if (dbError) throw dbError;
       setRegSuccess(true);

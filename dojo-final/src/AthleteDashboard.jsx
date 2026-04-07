@@ -189,7 +189,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {/* Selettore profilo — appare solo se ci sono più profili */}
-            {isReferente && allProfiles && allProfiles.length > 1 && (
+            {allProfiles && allProfiles.length > 1 && (
               <div style={{ position: "relative" }}>
                 <select
                   value={activeProfile?.id || ""}
@@ -229,6 +229,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
                 <div style={{ fontSize: 20, fontWeight: 700, color: "#e8e0d0" }}>{athlete.first_name} {athlete.last_name}</div>
                 <div style={{ margin: "6px 0" }}><BeltBadge belt={athlete.belt} large /></div>
                 <div style={{ fontSize: 12, color: "#5a5040" }}>{athlete.course} · {athlete.location}</div>
+                {athlete.start_date && <div style={{ fontSize: 12, color: "#5a5040", marginTop: 2 }}>📅 Pratica dal {athlete.start_date}</div>}
                 <div style={{ display: "flex", gap: 16, marginTop: 6, fontSize: 12, color: "#8a7a6a", flexWrap: "wrap" }}><span>📧 {athlete.email}</span><span>📞 {athlete.mobile}</span></div>
                 {athlete.status === "pending" && <div style={{ marginTop: 10, padding: "6px 12px", background: "rgba(218,165,32,0.1)", border: "1px solid rgba(218,165,32,0.3)", borderRadius: 6, fontSize: 12, color: "#daa520" }}>⏳ Iscrizione in attesa di approvazione</div>}
               </div>
@@ -412,7 +413,7 @@ export default function AthleteDashboard({ athlete, setAthlete, familyMembers, s
           <div>
             <h2 style={{ color: "#daa520", marginBottom: 18, fontSize: 20 }}>🏆 Eventi</h2>
             {[athlete, ...familyMembers].map(m => {
-              const memberExams = exams.filter(ep => (ep.athlete_id === m.id) || (ep.athletes?.id === m.id)).sort((a, b) => new Date(a.events?.event_date) - new Date(b.events?.event_date));
+              const memberExams = exams.filter(ep => ep.athlete_id === m.id).sort((a, b) => new Date(a.events?.event_date) - new Date(b.events?.event_date));
               if (memberExams.length === 0) return null;
               return (
                 <div key={m.id} style={{ marginBottom: 28 }}>
