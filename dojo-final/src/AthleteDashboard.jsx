@@ -9,9 +9,12 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, reloa
   const [newDate, setNewDate] = React.useState("");
   const [fileAnagrafica, setFileAnagrafica] = React.useState(null);
   const [fileCert, setFileCert] = React.useState(null);
+  // Stato locale per aggiornamento immediato UI dopo upload
+  const [localExpiry, setLocalExpiry] = React.useState(m.medical_expiry || null);
+  const [localFile, setLocalFile] = React.useState(m.medical_file || null);
 
   const oggi = new Date();
-  const scadenza = m.medical_expiry ? new Date(m.medical_expiry) : null;
+  const scadenza = localExpiry ? new Date(localExpiry) : null;
   const giorniRimasti = scadenza ? Math.ceil((scadenza - oggi) / (1000*60*60*24)) : null;
   const statoColore = !scadenza ? "#888" : giorniRimasti < 0 ? "#ef4444" : giorniRimasti < 30 ? "#daa520" : "#22c55e";
   const statoTesto = !scadenza ? "Nessun certificato" : giorniRimasti < 0 ? "❌ Scaduto" : giorniRimasti < 30 ? `⚠️ Scade tra ${giorniRimasti} giorni` : `✅ Valido fino al ${scadenza.toLocaleDateString("it-IT")}`;
@@ -43,11 +46,11 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, reloa
     if (pathAnagrafica) update.medical_file_anagrafica = pathAnagrafica;
     await supabase.from("athletes").update(update).eq("id", m.id);
 
+    // Aggiorna stato locale immediatamente — UI si aggiorna senza reload
+    setLocalExpiry(newDate);
+    if (pathCert) setLocalFile(pathCert);
     setShowForm(false); setFileCert(null); setFileAnagrafica(null); setNewDate("");
-    const { data: fam } = await supabase.from("athletes").select("*").eq("parent_athlete_id", athleteId);
-    setFamilyMembers(fam || []);
     setUploading(false);
-    window.location.reload();
   }
 
   return (
