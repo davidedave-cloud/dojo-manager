@@ -138,10 +138,12 @@ export default function AdminPanel({ session, supabase }) {
       location: editForm.location,
       lessons_per_month: Number(editForm.lessons_per_month) || 8,
       medical_expiry: editForm.medical_expiry || null,
+      start_date: editForm.start_date || null,
       parent_name: editForm.parent_name,
       parent_phone: editForm.parent_phone,
       parent_email: editForm.parent_email,
       notes: editForm.notes,
+      start_date: editForm.start_date || null,
     }).eq("id", editAthlete.id);
     if (!error) { await loadData(); setEditAthlete(null); }
   }
@@ -809,6 +811,7 @@ export default function AdminPanel({ session, supabase }) {
                 </select>
               </div>
               <div><label style={labelStyle}>Scad. cert. medico</label><input type="date" style={inputStyle} value={editForm.medical_expiry ? editForm.medical_expiry.slice(0,10) : ""} onChange={e => setEditForm(p => ({...p, medical_expiry: e.target.value}))} /></div>
+              <div><label style={labelStyle}>Inizio pratica (MM/AAAA)</label><input style={inputStyle} value={editForm.start_date || ""} onChange={e => setEditForm(p => ({...p, start_date: e.target.value}))} placeholder="es. 09/2023" maxLength={7} /></div>
             </div>
             {editForm.is_minor && (
               <div style={{ marginBottom: 12 }}>
