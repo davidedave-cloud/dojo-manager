@@ -3,7 +3,7 @@ import { supabase } from "./supabase.js";
 import { printModuloTesseramento } from "./printModulo.js";
 import {
   BELT_COLORS, BELT_ORDER, COURSES, LOCATIONS, HOW_FOUND, TABS,
-  MONTHS_IT, inputStyle, labelStyle, calcFamilyTotal, getMonthlyFee
+  MONTHS_IT, inputStyle, labelStyle, calcFamilyTotal, getMonthlyFee, emptyAthlete
 } from "./adminConstants.js";
 import PaymentsTab from "./PaymentsTab.jsx";
 import PresenzeTab from "./PresenzeTab.jsx";

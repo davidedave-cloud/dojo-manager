@@ -43,3 +43,14 @@ export function calcFamilyTotal(mainAthlete, allAthletes) {
   const final = totalEight - discount + totalFour;
   return { members, total, discount, final, discountPct };
 }
+
+export const emptyAthlete = {
+  first_name: "", last_name: "", email: "", mobile: "", phone: "",
+  birth_date: "", birth_place: "", fiscal_code: "",
+  address: "", city: "", zip: "", province: "",
+  belt: "Bianca", course: "Karate Adulti", location: "Argenta",
+  lessons_per_month: 8, is_minor: false,
+  parent_name: "", parent_phone: "", parent_email: "", parent_cf: "",
+  medical_expiry: "", notes: "", status: "approved",
+  gdpr_consent: true, is_volunteer: false, start_date: "",
+};
