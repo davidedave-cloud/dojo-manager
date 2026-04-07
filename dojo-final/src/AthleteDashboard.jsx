@@ -27,16 +27,14 @@ function CertificatoCard({ m, isMe, supabase, athleteId, setFamilyMembers, input
     if (fileAnagrafica) {
       const ext = fileAnagrafica.name.split(".").pop();
       pathAnagrafica = "certificati/" + cognome + "-" + nome + "-anagrafica." + ext;
-      await supabase.storage.from("pagamenti").remove([pathAnagrafica]);
-      const { error } = await supabase.storage.from("pagamenti").upload(pathAnagrafica, fileAnagrafica);
+      const { error } = await supabase.storage.from("pagamenti").upload(pathAnagrafica, fileAnagrafica, { upsert: true });
       if (error) { alert("Errore upload anagrafica: " + error.message); setUploading(false); return; }
     }
 
     if (fileCert) {
       const ext = fileCert.name.split(".").pop();
       pathCert = "certificati/" + cognome + "-" + nome + "-cert-" + newDate + "." + ext;
-      await supabase.storage.from("pagamenti").remove([pathCert]);
-      const { error } = await supabase.storage.from("pagamenti").upload(pathCert, fileCert);
+      const { error } = await supabase.storage.from("pagamenti").upload(pathCert, fileCert, { upsert: true });
       if (error) { alert("Errore upload certificato: " + error.message); setUploading(false); return; }
     }
 
