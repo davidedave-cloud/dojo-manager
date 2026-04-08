@@ -1,4 +1,6 @@
-const CACHE_NAME = 'cinque-cerchi-' + self.__WB_MANIFEST_VERSION || Date.now();
+importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
+
+const CACHE_NAME = 'cinque-cerchi-v3';
 const urlsToCache = ['/', '/index.html'];
 
 self.addEventListener('install', event => {
