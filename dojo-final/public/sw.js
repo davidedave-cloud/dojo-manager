@@ -1,22 +1,7 @@
-importScripts('https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js');
-
-const CACHE_NAME = 'cinque-cerchi-v3';
-const urlsToCache = ['/', '/index.html'];
+const CACHE_NAME = 'cinque-cerchi-v4';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-  );
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      if (response) return response;
-      return fetch(event.request);
-    })
-  );
 });
 
 self.addEventListener('activate', event => {
