@@ -26,6 +26,16 @@ export default function AthletePortal({ session, supabase }) {
     const { data: mainAthlete } = await supabase.from("athletes").select("*").eq("user_id", userId).single();
 
     if (mainAthlete) {
+      // Salva onesignal_id se disponibile
+      try {
+        if (window.OneSignal) {
+          const osId = await window.OneSignal.User.PushSubscription.id;
+          if (osId && osId !== mainAthlete.onesignal_id) {
+            await supabase.from("athletes").update({ onesignal_id: osId }).eq("id", mainAthlete.id);
+          }
+        }
+      } catch(e) {}
+
       // 2. Carica tutti i profili della famiglia
       const rootId = mainAthlete.parent_athlete_id || mainAthlete.id;
       const { data: famData } = await supabase.from("athletes").select("*").eq("parent_athlete_id", rootId);
