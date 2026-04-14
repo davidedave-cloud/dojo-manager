@@ -470,8 +470,8 @@ export default function AdminPanel({ session, supabase }) {
             {filteredAthletes.length === 0 ? (
               <div style={{ textAlign: "center", padding: 60, color: "#555" }}><div style={{ fontSize: 36, marginBottom: 12 }}>👥</div><div>Nessun atleta trovato.</div></div>
             ) : (
-              <div style={{ background: "#1a1a0e", border: "1px solid #2a2a1a", borderRadius: 12, overflow: "hidden" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <div style={{ background: "#1a1a0e", border: "1px solid #2a2a1a", borderRadius: 12, overflow: "hidden", overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
                   <thead><tr style={{ borderBottom: "1px solid #2a2a1a" }}>
                     {[...(bulkMode ? [""] : []), "Atleta", "Cintura", "Corso & Sede", "Stato", "Azioni"].map(h => (
                       <th key={h} style={{ padding: "14px 16px", textAlign: "left", fontSize: 11, color: "#777", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>{h}</th>

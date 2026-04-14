@@ -181,20 +181,37 @@ export default function PresenzeTab({ athletes, lessons, supabase, onReload, Bel
         {pastLessons.length === 0 && todayLessons.length === 0 && (
           <div style={{ textAlign: "center", padding: 60, color: "#555" }}><div style={{ fontSize: 36, marginBottom: 12 }}>📋</div><div>Nessuna lezione ancora. Clicca "+ Nuova Lezione" per iniziare!</div></div>
         )}
-        {pastLessons.slice(0, 20).map(l => (
-          <div key={l.id} style={{ background: "#1a1a0e", border: "1px solid #2a2a1a", borderRadius: 12, padding: 16, marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div onClick={() => openLesson(l)} style={{ flex: 1, cursor: "pointer" }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#e8e0d0" }}>{l.lesson_type} — {l.location}</div>
-              <div style={{ fontSize: 12, color: "#777", marginTop: 2 }}>{new Date(l.lesson_date).toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" })} · {l.lesson_time?.slice(0,5)} · {l.instructor}</div>
+        {(() => {
+          // Raggruppa per data
+          const byDate = {};
+          pastLessons.slice(0, 30).forEach(l => {
+            const d = l.lesson_date;
+            if (!byDate[d]) byDate[d] = [];
+            byDate[d].push(l);
+          });
+          return Object.keys(byDate).sort((a, b) => b.localeCompare(a)).map(date => (
+            <div key={date} style={{ marginBottom: 18 }}>
+              <div style={{ fontSize: 12, color: "#daa520", fontWeight: 700, marginBottom: 8, paddingBottom: 4, borderBottom: "1px solid #2a2a1a" }}>
+                📅 {new Date(date).toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+              </div>
+              {byDate[date].sort((a, b) => (a.lesson_time || "").localeCompare(b.lesson_time || "")).map(l => (
+                <div key={l.id} style={{ background: "#1a1a0e", border: "1px solid #2a2a1a", borderRadius: 12, padding: 14, marginBottom: 6 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
+                    <div onClick={() => openLesson(l)} style={{ cursor: "pointer" }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "#e8e0d0" }}>{l.location} — {l.lesson_type}</div>
+                      <div style={{ fontSize: 12, color: "#777", marginTop: 2 }}>🕐 {l.lesson_time?.slice(0,5)} · {l.instructor} · {l.attendances?.length || 0} presenti</div>
+                    </div>
+                    <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                      <button onClick={() => openLesson(l)} style={{ background: "rgba(218,165,32,0.15)", color: "#daa520", border: "1px solid #daa520", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>✏️ Presenze</button>
+                      <button onClick={() => { setEditLesson(l); setEditLessonForm({ date: l.lesson_date, time: l.lesson_time?.slice(0,5) || "18:00", course: l.lesson_type, location: l.location, instructor: l.instructor || "" }); }} style={{ background: "rgba(74,158,255,0.15)", color: "#4a9eff", border: "1px solid #4a9eff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>🔧</button>
+                      <button onClick={() => deleteLesson(l)} disabled={deletingLesson === l.id} style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>{deletingLesson === l.id ? "..." : "🗑️"}</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 12, color: "#777" }}>{l.attendances?.length || 0} presenti</span>
-              <button onClick={() => openLesson(l)} style={{ background: "rgba(218,165,32,0.15)", color: "#daa520", border: "1px solid #daa520", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>✏️ Presenze</button>
-              <button onClick={() => { setEditLesson(l); setEditLessonForm({ date: l.lesson_date, time: l.lesson_time?.slice(0,5) || "18:00", course: l.lesson_type, location: l.location, instructor: l.instructor || "" }); }} style={{ background: "rgba(74,158,255,0.15)", color: "#4a9eff", border: "1px solid #4a9eff", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>🔧 Modifica</button>
-              <button onClick={() => deleteLesson(l)} disabled={deletingLesson === l.id} style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>{deletingLesson === l.id ? "..." : "🗑️"}</button>
-            </div>
-          </div>
-        ))}
+          ));
+        })()}
       </div>
 
       {/* MODAL MODIFICA LEZIONE */}
