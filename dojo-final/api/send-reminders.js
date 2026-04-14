@@ -79,8 +79,8 @@ function buildEmailHtml(athlete, amount, monthLabel, year, familyInfo) {
       </div>
 
       <p style="font-size:13px;color:#888;line-height:1.7;margin:0;">
-        Non hai partecipato questo mese? Nessun problema, puoi ignorare questa email. 
-        Per qualsiasi domanda contattaci rispondendo a questo messaggio.
+        Non hai partecipato questo mese? Nessun problema, puoi ignorare questa email.
+        Per qualsiasi informazione contatta il responsabile del dojo.
       </p>
     </div>
 
