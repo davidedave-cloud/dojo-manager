@@ -23,6 +23,7 @@ export default function AdminPanel({ session, supabase }) {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAthlete, setSelectedAthlete] = useState(null);
+  const [athleteAttendances, setAthleteAttendances] = useState([]);
   const [showReceipt, setShowReceipt] = useState(null);
   const [search, setSearch] = useState("");
   const [filterBelt, setFilterBelt] = useState("Tutte");
@@ -500,7 +501,16 @@ export default function AdminPanel({ session, supabase }) {
                           <td style={{ padding: "14px 16px", minWidth: 160, whiteSpace: "nowrap" }}><StatusBadge status={a.status} /></td>
                           <td style={{ padding: "14px 16px", minWidth: 420, whiteSpace: "nowrap" }}>
                             <div style={{ display: "flex", gap: 6, flexWrap: "nowrap", alignItems: "center" }}>
-                              <button onClick={() => setSelectedAthlete(a)} style={{ background: "#2a2a1a", color: "#daa520", border: "1px solid #3a3a2a", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>Dettagli</button>
+                              <button onClick={async () => {
+                          setSelectedAthlete(a);
+                          const { data: att } = await supabase
+                            .from("attendances")
+                            .select("*, lessons(lesson_date, lesson_type, location)")
+                            .eq("athlete_id", a.id)
+                            .eq("present", true)
+                            .order("created_at", { ascending: false });
+                          setAthleteAttendances(att || []);
+                        }} style={{ background: "#2a2a1a", color: "#daa520", border: "1px solid #3a3a2a", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>Dettagli</button>
                               {a.status === "pending" && <button onClick={() => approveAthlete(a.id)} style={{ background: "rgba(34,197,94,0.2)", color: "#22c55e", border: "1px solid #22c55e", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>✓ Approva</button>}
                               {a.status === "approved" && <button onClick={() => setActiveTab("Pagamenti")} style={{ background: "rgba(74,158,255,0.15)", color: "#4a9eff", border: "1px solid #4a9eff", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>💶 Pagamento</button>}
                               <button onClick={() => openAddAthlete("familiare", a.id)} style={{ background: "rgba(192,132,252,0.15)", color: "#c084fc", border: "1px solid #c084fc", borderRadius: 6, padding: "5px 10px", cursor: "pointer", fontSize: 11, fontFamily: "inherit" }}>+ Familiare</button>
@@ -805,6 +815,32 @@ export default function AdminPanel({ session, supabase }) {
                 </div>
               </div>
             )}
+            {/* Sezione presenze */}
+            <div style={{ marginTop: 16, background: "#0d0c07", border: "1px solid #2a2010", borderRadius: 10, padding: "14px 16px" }}>
+              <div style={{ fontSize: 12, color: "#daa520", fontWeight: 700, marginBottom: 10 }}>📋 Presenze ({athleteAttendances.length} totali)</div>
+              {athleteAttendances.length === 0 ? (
+                <div style={{ fontSize: 12, color: "#555" }}>Nessuna presenza registrata.</div>
+              ) : (() => {
+                const byMonth = {};
+                athleteAttendances.forEach(a => {
+                  if (!a.lessons?.lesson_date) return;
+                  const d = new Date(a.lessons.lesson_date);
+                  const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+                  if (!byMonth[key]) byMonth[key] = [];
+                  byMonth[key].push(a);
+                });
+                const MONTHS = ["","Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+                return Object.keys(byMonth).sort((a,b) => b.localeCompare(a)).map(key => {
+                  const [year, month] = key.split("-");
+                  return (
+                    <div key={key} style={{ marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 0", borderBottom: "1px solid #1a1a0e" }}>
+                      <span style={{ fontSize: 12, color: "#8a7a6a" }}>{MONTHS[parseInt(month)]} {year}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#22c55e" }}>{byMonth[key].length} lezioni</span>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
               {selectedAthlete.status === "pending" && <button onClick={() => { approveAthlete(selectedAthlete.id); setSelectedAthlete(null); }} style={{ flex: 1, background: "rgba(34,197,94,0.2)", color: "#22c55e", border: "1px solid #22c55e", borderRadius: 8, padding: 10, cursor: "pointer", fontFamily: "inherit", fontSize: 13 }}>✓ Approva Iscrizione</button>}
               <button onClick={() => printModuloTesseramento(selectedAthlete, stagione)} style={{ flex: 1, background: "rgba(218,165,32,0.15)", color: "#daa520", border: "1px solid #daa520", borderRadius: 8, padding: 10, cursor: "pointer", fontFamily: "inherit", fontSize: 13 }}>🖨️ Stampa Modulo</button>
