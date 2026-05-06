@@ -31,6 +31,7 @@ export default function PresenzeTab({ athletes, lessons, supabase, onReload, Bel
   const [editLesson, setEditLesson] = useState(null);
   const [editLessonForm, setEditLessonForm] = useState({});
   const [deletingLesson, setDeletingLesson] = useState(null);
+  const [extraSearch, setExtraSearch] = useState("");
 
   async function openLesson(lesson) {
     setSelectedLesson(lesson);
@@ -119,7 +120,7 @@ export default function PresenzeTab({ athletes, lessons, supabase, onReload, Bel
             <h2 style={{ color: "#daa520", fontSize: 22, margin: 0 }}>{selectedLesson.lesson_type} — {selectedLesson.location}</h2>
             <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>{new Date(selectedLesson.lesson_date).toLocaleDateString("it-IT", { weekday: "long", day: "numeric", month: "long" })} · {selectedLesson.lesson_time?.slice(0,5)}</div>
           </div>
-          <div style={{ fontSize: 14, color: "#daa520", fontWeight: 700 }}>{Object.values(presenze).filter(Boolean).length} / {lessonAthletes.length} presenti</div>
+          <div style={{ fontSize: 14, color: "#daa520", fontWeight: 700 }}>{Object.values(presenze).filter(Boolean).length} presenti</div>
         </div>
         {lessonAthletes.length === 0 && (
           <div style={{ padding: 20, background: "#1a1a0e", borderRadius: 10, color: "#777", fontSize: 13, marginBottom: 20 }}>
@@ -141,6 +142,38 @@ export default function PresenzeTab({ athletes, lessons, supabase, onReload, Bel
               </div>
             );
           })}
+        </div>
+        {/* Ricerca atleti extra fuori sede */}
+        <div style={{ marginBottom: 20, padding: "16px 20px", background: "#131008", border: "1px solid #2a2010", borderRadius: 12 }}>
+          <div style={{ fontSize: 13, color: "#daa520", fontWeight: 700, marginBottom: 10 }}>➕ Aggiungi atleta extra (fuori sede)</div>
+          <input
+            style={{ width: "100%", background: "#0d0c07", border: "1px solid #2a2010", borderRadius: 8, padding: "10px 12px", color: "#e8e0d0", fontFamily: "inherit", fontSize: 13, boxSizing: "border-box", marginBottom: 8 }}
+            placeholder="Cerca per nome o cognome..."
+            value={extraSearch}
+            onChange={e => setExtraSearch(e.target.value)}
+          />
+          {extraSearch.length >= 2 && (() => {
+            const lessonIds = new Set(lessonAthletes.map(a => a.id));
+            const results = athletes.filter(a =>
+              a.status === "approved" &&
+              !lessonIds.has(a.id) &&
+              (`${a.first_name} ${a.last_name}`).toLowerCase().includes(extraSearch.toLowerCase())
+            ).slice(0, 6);
+            if (results.length === 0) return <div style={{ fontSize: 12, color: "#555" }}>Nessun atleta trovato.</div>;
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {results.map(a => (
+                  <div key={a.id} onClick={() => { togglePresenza(a.id); setExtraSearch(""); }} style={{ background: presenze[a.id] ? "rgba(34,197,94,0.15)" : "#0d0c07", border: `1px solid ${presenze[a.id] ? "#22c55e" : "#2a2010"}`, borderRadius: 8, padding: "10px 14px", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: presenze[a.id] ? "#22c55e" : "#e8e0d0" }}>{a.first_name} {a.last_name}</span>
+                      <span style={{ fontSize: 11, color: "#555", marginLeft: 8 }}>{a.course} · {a.location}</span>
+                    </div>
+                    <span style={{ fontSize: 12, color: presenze[a.id] ? "#22c55e" : "#5a5040" }}>{presenze[a.id] ? "✓ Presente" : "Tocca per aggiungere"}</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
         <button onClick={savePresenze} disabled={saving} style={{ background: "linear-gradient(135deg,#b8860b,#daa520)", color: "#0d0d0d", border: "none", borderRadius: 10, padding: "14px 40px", cursor: "pointer", fontWeight: 700, fontSize: 15, fontFamily: "inherit", opacity: saving ? 0.7 : 1 }}>
           {saving ? "Salvataggio..." : "✓ Salva Presenze"}
